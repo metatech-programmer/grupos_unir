@@ -188,8 +188,36 @@ export default function GroupDetailPage() {
           })
           .filter((member): member is GroupMemberWithRole => Boolean(member))
 
-        setMembers(normalizedMembers)
-        setIsCurrentUserAdmin(normalizedMembers.some((member) => member.user.id === userData.id && member.role === 'admin'))
+        let finalMembers = normalizedMembers
+
+        if (!finalMembers.some((member) => member.user.id === userData.id)) {
+          const fallbackRole: 'admin' | 'member' = groupData.created_by_auth === authId ? 'admin' : 'member'
+
+          const { error: selfRepairError } = await supabase
+            .from('group_members')
+            .upsert([
+              {
+                user_id: userData.id,
+                group_id: groupId,
+                role: fallbackRole,
+              },
+            ], { onConflict: 'user_id,group_id' })
+
+          if (selfRepairError) {
+            console.warn('Could not ensure current user in group_members:', selfRepairError)
+          }
+
+          finalMembers = [
+            ...finalMembers,
+            {
+              role: fallbackRole,
+              user: userData,
+            },
+          ]
+        }
+
+        setMembers(finalMembers)
+        setIsCurrentUserAdmin(finalMembers.some((member) => member.user.id === userData.id && member.role === 'admin'))
 
         const { data: messagesData, error: messagesError } = await supabase
           .from('group_messages')
