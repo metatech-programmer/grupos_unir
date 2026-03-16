@@ -54,7 +54,7 @@ export default function LoginPage() {
           <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
             <TeamIcon className="h-5 w-5" />
           </div>
-          <h2 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Acceder a GrupoFlow</h2>
+          <h2 className="text-xl sm:text-2xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Acceder a GrupoFlow</h2>
         </div>
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}

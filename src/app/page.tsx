@@ -24,16 +24,16 @@ const features = [
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <header className="max-w-7xl mx-auto px-4 py-5 flex items-center justify-between">
+      <header className="max-w-7xl mx-auto px-4 py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
             <TeamIcon className="h-5 w-5" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-sora)' }}>GrupoFlow</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-sora)' }}>GrupoFlow</h1>
         </div>
-        <div className="flex gap-3">
-          <Link href="/login" className="btn-outline">Iniciar sesion</Link>
-          <Link href="/register" className="btn-primary">Crear cuenta</Link>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto">
+          <Link href="/login" className="btn-outline w-full">Iniciar sesion</Link>
+          <Link href="/register" className="btn-primary w-full">Crear cuenta</Link>
         </div>
       </header>
 
@@ -45,15 +45,15 @@ export default function Home() {
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
                 Distribucion Inteligente de Equipos
               </p>
-              <h2 className="text-4xl md:text-6xl font-bold leading-tight text-slate-900" style={{ fontFamily: 'var(--font-sora)' }}>
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight text-slate-900" style={{ fontFamily: 'var(--font-sora)' }}>
                 Organiza grupos con una experiencia clara y moderna.
               </h2>
-              <p className="mt-5 text-slate-600 text-lg max-w-xl">
+              <p className="mt-5 text-slate-600 text-base sm:text-lg max-w-xl">
                 Diseñada para clases internacionales: crea equipos de 3 a 5 personas, compara pros y contras, y decide con informacion real.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/explore" className="btn-primary">Explorar grupos</Link>
-                <Link href="/create-group" className="btn-outline">Crear grupo</Link>
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
+                <Link href="/explore" className="btn-primary w-full">Explorar grupos</Link>
+                <Link href="/create-group" className="btn-outline w-full">Crear grupo</Link>
               </div>
             </div>
 

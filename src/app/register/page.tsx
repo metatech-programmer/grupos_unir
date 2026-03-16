@@ -147,9 +147,9 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen px-4 py-8 md:py-14">
       <div className="max-w-4xl mx-auto card">
-        <div className="flex items-start justify-between gap-4 mb-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Crear Perfil Operativo</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Crear Perfil Operativo</h2>
             <p className="text-slate-600 mt-2">La distribucion inteligente usa horario, carga diaria, trabajo y actividades.</p>
           </div>
           <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">

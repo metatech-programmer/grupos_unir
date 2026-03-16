@@ -334,27 +334,27 @@ export default function GroupDetailPage() {
   return (
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-5xl mx-auto">
-        <header className="card mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <header className="card mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-start sm:items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
               <TeamIcon className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>{group.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold break-words" style={{ fontFamily: 'var(--font-sora)' }}>{group.name}</h1>
               <p className="text-slate-600">{group.subject}</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full md:w-auto">
             {canDelete && (
               <button
                 onClick={handleDeleteGroup}
                 disabled={deleting}
-                className="px-4 py-2 rounded-xl border border-rose-200 text-rose-700 font-semibold hover:bg-rose-50 disabled:opacity-50"
+                className="px-4 py-2 rounded-xl border border-rose-200 text-rose-700 font-semibold hover:bg-rose-50 disabled:opacity-50 w-full"
               >
                 {deleting ? 'Eliminando...' : 'Eliminar grupo'}
               </button>
             )}
-            <Link href="/explore" className="btn-outline">Volver</Link>
+            <Link href="/explore" className="btn-outline w-full">Volver</Link>
           </div>
         </header>
 
@@ -441,7 +441,7 @@ export default function GroupDetailPage() {
                     </div>
                     <p className="text-sm text-slate-600">{member.user.timezone}</p>
                   </div>
-                  <div className="flex flex-wrap gap-2 text-sm items-center">
+                  <div className="flex flex-wrap gap-2 text-sm items-center w-full md:w-auto">
                     <a href={`mailto:${member.user.email}`} className="px-3 py-1 rounded-full border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100" target="_blank" rel="noreferrer">
                       Correo
                     </a>
@@ -493,7 +493,7 @@ export default function GroupDetailPage() {
                 ) : (
                   messages.map((message) => (
                     <div key={message.id} className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
-                      <div className="flex items-center justify-between gap-2 mb-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 mb-1">
                         <span className="text-sm font-semibold text-slate-800">{message.users?.name || 'Miembro'}</span>
                         <span className="text-xs text-slate-500">{new Date(message.created_at).toLocaleString()}</span>
                       </div>
@@ -509,7 +509,7 @@ export default function GroupDetailPage() {
                 </p>
               )}
 
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   value={newMessage}
                   onChange={(e) => {
@@ -541,7 +541,7 @@ export default function GroupDetailPage() {
                   className="input-modern"
                   placeholder="Escribe un mensaje para el grupo..."
                 />
-                <button onClick={handleSendMessage} disabled={sending || !newMessage.trim()} className="btn-primary whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed">
+                <button onClick={handleSendMessage} disabled={sending || !newMessage.trim()} className="btn-primary sm:whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto">
                   {sending ? 'Enviando...' : 'Enviar'}
                 </button>
               </div>

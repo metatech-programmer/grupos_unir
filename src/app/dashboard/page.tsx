@@ -104,7 +104,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen px-4 py-6 md:py-10">
-      <header className="max-w-7xl mx-auto card mb-6 flex items-center justify-between">
+      <header className="max-w-7xl mx-auto card mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
             <TeamIcon className="h-5 w-5" />
@@ -114,7 +114,7 @@ export default function DashboardPage() {
             <p className="text-slate-600 text-sm">Hola, {user.name}</p>
           </div>
         </div>
-        <button onClick={handleLogout} className="btn-outline text-sm">Cerrar sesion</button>
+        <button onClick={handleLogout} className="btn-outline text-sm w-full sm:w-auto">Cerrar sesion</button>
       </header>
 
       <main className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-6">
