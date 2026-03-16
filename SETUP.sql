@@ -1,5 +1,21 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- ============================================
+-- RESET TOTAL (DESTRUCTIVO)
+-- Elimina objetos de esta app para recrearlos
+-- ============================================
+DROP TRIGGER IF EXISTS on_auth_user_created_or_updated ON auth.users;
+
+DROP FUNCTION IF EXISTS public.handle_auth_user_sync() CASCADE;
+DROP FUNCTION IF EXISTS public.is_admin_of_group(UUID) CASCADE;
+DROP FUNCTION IF EXISTS public.is_member_of_group(UUID) CASCADE;
+DROP FUNCTION IF EXISTS public.current_user_profile_id() CASCADE;
+
+DROP TABLE IF EXISTS public.group_messages CASCADE;
+DROP TABLE IF EXISTS public.group_members CASCADE;
+DROP TABLE IF EXISTS public.users CASCADE;
+DROP TABLE IF EXISTS public.groups CASCADE;
+
 -- Create groups table first because users.group_id references groups.id
 CREATE TABLE IF NOT EXISTS groups (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
