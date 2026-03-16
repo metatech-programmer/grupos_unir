@@ -167,7 +167,7 @@ export default function CreateGroupPage() {
 
   return (
     <div className="min-h-screen px-4 py-8 md:py-14">
-      <div className="max-w-4xl mx-auto card">
+      <div className="max-w-3xl mx-auto card">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Crear Grupo</h1>
@@ -259,11 +259,11 @@ export default function CreateGroupPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-50">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:justify-items-start">
+            <button type="submit" disabled={loading} className="btn-primary w-full sm:w-auto disabled:opacity-50">
               {loading ? 'Creando grupo...' : 'Crear Grupo'}
             </button>
-            <Link href="/explore" className="btn-outline w-full">Volver a explorar</Link>
+            <Link href="/explore" className="btn-outline w-full sm:w-auto">Volver a explorar</Link>
           </div>
         </form>
       </div>

@@ -482,7 +482,7 @@ export default function GroupDetailPage() {
 
   return (
     <div className="min-h-screen px-4 py-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <header className="card mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-start sm:items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
@@ -493,17 +493,17 @@ export default function GroupDetailPage() {
               <p className="text-slate-600">{group.subject}</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full md:w-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full md:w-auto md:justify-end">
             {canDelete && (
               <button
                 onClick={handleDeleteGroup}
                 disabled={deleting}
-                className="px-4 py-2 rounded-xl border border-rose-200 text-rose-700 font-semibold hover:bg-rose-50 disabled:opacity-50 w-full"
+                className="px-4 py-2 rounded-xl border border-rose-200 text-rose-700 font-semibold hover:bg-rose-50 disabled:opacity-50 w-full sm:w-auto"
               >
                 {deleting ? 'Eliminando...' : 'Eliminar grupo'}
               </button>
             )}
-            <Link href="/explore" className="btn-outline w-full">Volver</Link>
+            <Link href="/explore" className="btn-outline w-full sm:w-auto">Volver</Link>
           </div>
         </header>
 

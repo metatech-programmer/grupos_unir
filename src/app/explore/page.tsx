@@ -193,7 +193,7 @@ export default function ExplorePage() {
 
   return (
     <div className="min-h-screen px-4 py-6 md:py-10">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <header className="card mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
@@ -204,14 +204,14 @@ export default function ExplorePage() {
               <p className="text-slate-600 text-sm">IA gratuita local: horario, trabajo, actividades y tiempo diario.</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full lg:w-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full lg:w-auto lg:justify-end">
             {user ? (
               <>
-                <Link href="/create-group" className="btn-outline w-full">Crear grupo</Link>
-                <Link href="/dashboard" className="btn-outline w-full">Dashboard</Link>
+                <Link href="/create-group" className="btn-outline w-full sm:w-auto">Crear grupo</Link>
+                <Link href="/dashboard" className="btn-outline w-full sm:w-auto">Dashboard</Link>
               </>
             ) : (
-              <Link href="/login" className="btn-outline w-full sm:col-span-2">Iniciar sesion</Link>
+              <Link href="/login" className="btn-outline w-full sm:w-auto sm:col-span-2">Iniciar sesion</Link>
             )}
           </div>
         </header>
@@ -277,9 +277,9 @@ export default function ExplorePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button onClick={() => handleJoinGroup(suggestion.group.id)} className="btn-primary w-full">{user ? 'Unirme a este grupo' : 'Inicia sesion para unirte'}</button>
-                  <Link href={`/groups/${suggestion.group.id}`} className="btn-outline w-full">Ver detalle</Link>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:justify-items-start">
+                  <button onClick={() => handleJoinGroup(suggestion.group.id)} className="btn-primary w-full sm:w-auto">{user ? 'Unirme a este grupo' : 'Inicia sesion para unirte'}</button>
+                  <Link href={`/groups/${suggestion.group.id}`} className="btn-outline w-full sm:w-auto">Ver detalle</Link>
                 </div>
               </article>
             ))}

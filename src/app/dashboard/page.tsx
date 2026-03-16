@@ -104,7 +104,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen px-4 py-6 md:py-10">
-      <header className="max-w-7xl mx-auto card mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <header className="max-w-6xl mx-auto card mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
             <TeamIcon className="h-5 w-5" />
@@ -117,7 +117,7 @@ export default function DashboardPage() {
         <button onClick={handleLogout} className="btn-outline text-sm w-full sm:w-auto">Cerrar sesion</button>
       </header>
 
-      <main className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-6">
+      <main className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-6">
         <section className="card lg:col-span-1">
           <h2 className="font-semibold text-lg mb-4" style={{ fontFamily: 'var(--font-sora)' }}>Perfil de trabajo</h2>
           <div className="space-y-2 text-sm text-slate-700">
@@ -129,7 +129,7 @@ export default function DashboardPage() {
             <p><strong>Horario:</strong> {String(user.availability_start).padStart(2, '0')}:00 - {String(user.availability_end).padStart(2, '0')}:00</p>
             <p><strong>Actividades:</strong> {(user.activities || []).join(', ')}</p>
           </div>
-          <Link href="/register" className="btn-outline w-full text-center mt-5 block">Actualizar perfil</Link>
+          <Link href="/register" className="btn-outline mt-5 inline-flex">Actualizar perfil</Link>
         </section>
 
         <section className="card lg:col-span-2">

@@ -3,22 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --bg-soft: #f4f6fb;
+  --bg-soft: #f8fafc;
   --ink-strong: #0f172a;
   --ink-muted: #475569;
   --line: #d9e2f1;
-  --brand-900: #102a43;
-  --brand-700: #1f4d7a;
-  --brand-500: #2b6cb0;
-  --brand-300: #79b8ff;
+  --brand-900: #0f172a;
+  --brand-700: #1e293b;
+  --brand-500: #334155;
+  --brand-300: #94a3b8;
   --mint-500: #15b79e;
 }
 
 body {
   color: var(--ink-strong);
   background:
-    radial-gradient(1200px 500px at 10% -10%, rgba(43, 108, 176, 0.18), transparent),
-    radial-gradient(900px 400px at 100% 0%, rgba(21, 183, 158, 0.14), transparent),
+    radial-gradient(900px 320px at 10% -10%, rgba(51, 65, 85, 0.06), transparent),
+    radial-gradient(700px 280px at 100% 0%, rgba(148, 163, 184, 0.08), transparent),
     var(--bg-soft);
 }
 
@@ -64,13 +64,13 @@ body {
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center px-4 sm:px-5 py-2.5 rounded-xl text-white font-semibold text-center leading-tight transition-all duration-200;
-    background: linear-gradient(135deg, var(--brand-700), var(--brand-500));
-    box-shadow: 0 8px 30px rgba(16, 42, 67, 0.22);
+    background: var(--brand-700);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16);
   }
 
   .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 14px 36px rgba(16, 42, 67, 0.26);
+    background: var(--brand-900);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
   }
 
   .btn-secondary {
@@ -83,7 +83,7 @@ body {
     @apply inline-flex items-center justify-center px-4 sm:px-5 py-2.5 rounded-xl border font-semibold text-center leading-tight transition-all duration-200;
     border-color: var(--line);
     color: var(--brand-700);
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: #fff;
   }
 
   .btn-outline:hover {
@@ -94,9 +94,9 @@ body {
   .card {
     @apply rounded-2xl p-4 sm:p-6;
     border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.86);
-    box-shadow: 0 14px 50px rgba(15, 23, 42, 0.08);
-    backdrop-filter: blur(5px);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    backdrop-filter: none;
   }
 
   .input-modern {

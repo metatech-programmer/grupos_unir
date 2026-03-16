@@ -24,20 +24,20 @@ const features = [
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <header className="max-w-7xl mx-auto px-4 py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <header className="max-w-6xl mx-auto px-4 py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
             <TeamIcon className="h-5 w-5" />
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-sora)' }}>GrupoFlow</h1>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto">
-          <Link href="/login" className="btn-outline w-full">Iniciar sesion</Link>
-          <Link href="/register" className="btn-primary w-full">Crear cuenta</Link>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto sm:justify-end">
+          <Link href="/login" className="btn-outline w-full sm:w-auto">Iniciar sesion</Link>
+          <Link href="/register" className="btn-primary w-full sm:w-auto">Crear cuenta</Link>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 pb-16">
+      <main className="max-w-6xl mx-auto px-4 pb-16">
         <section className="hero-grid card overflow-hidden relative">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
@@ -52,8 +52,8 @@ export default function Home() {
                 Diseñada para clases internacionales: crea equipos de 3 a 5 personas, compara pros y contras, y decide con informacion real.
               </p>
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
-                <Link href="/explore" className="btn-primary w-full">Explorar grupos</Link>
-                <Link href="/create-group" className="btn-outline w-full">Crear grupo</Link>
+                <Link href="/explore" className="btn-primary w-full sm:w-auto">Explorar grupos</Link>
+                <Link href="/create-group" className="btn-outline w-full sm:w-auto">Crear grupo</Link>
               </div>
             </div>
 
