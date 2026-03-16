@@ -124,6 +124,18 @@ AS $$
     FROM public.group_members gm
     WHERE gm.user_id = public.current_user_profile_id()
       AND gm.group_id = target_group_id
+  )
+  OR EXISTS (
+    SELECT 1
+    FROM public.users u
+    WHERE u.id = public.current_user_profile_id()
+      AND u.group_id = target_group_id
+  )
+  OR EXISTS (
+    SELECT 1
+    FROM public.groups g
+    WHERE g.id = target_group_id
+      AND public.current_user_profile_id()::text = ANY(g.members)
   );
 $$;
 
