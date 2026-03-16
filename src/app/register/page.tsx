@@ -79,10 +79,13 @@ export default function RegisterPage() {
         return
       }
 
+      const redirectBaseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
+          emailRedirectTo: `${redirectBaseUrl}/login`,
           data: {
             name: formData.name,
             country: formData.country,
