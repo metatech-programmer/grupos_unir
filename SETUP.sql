@@ -423,6 +423,7 @@ DROP POLICY IF EXISTS group_members_update_policy ON group_members;
 
 DROP POLICY IF EXISTS group_messages_select_policy ON group_messages;
 DROP POLICY IF EXISTS group_messages_insert_policy ON group_messages;
+DROP POLICY IF EXISTS group_messages_delete_policy ON group_messages;
 
 -- users: each authenticated user can only see and manage their row
 CREATE POLICY users_select_policy ON users
@@ -502,3 +503,7 @@ CREATE POLICY group_messages_insert_policy ON group_messages
     public.is_member_of_group(group_messages.group_id)
     AND group_messages.user_id = public.current_user_profile_id()
   );
+
+CREATE POLICY group_messages_delete_policy ON group_messages
+  FOR DELETE
+  USING (group_messages.user_id = public.current_user_profile_id());

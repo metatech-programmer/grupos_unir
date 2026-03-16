@@ -44,6 +44,7 @@ export default function GroupDetailPage() {
   const [typingUsers, setTypingUsers] = useState<string[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [sending, setSending] = useState(false)
+  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null)
   const [updatingRoleUserId, setUpdatingRoleUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
@@ -365,6 +366,35 @@ export default function GroupDetailPage() {
     }
   }
 
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!currentUser || deletingMessageId) return
+
+    const targetMessage = messages.find((message) => message.id === messageId)
+    if (!targetMessage || targetMessage.user_id !== currentUser.id) return
+
+    const confirmed = window.confirm('Deseas eliminar este mensaje?')
+    if (!confirmed) return
+
+    const previousMessages = messages
+    setDeletingMessageId(messageId)
+    setMessages((prev) => prev.filter((message) => message.id !== messageId))
+
+    try {
+      const { error: deleteError } = await supabase
+        .from('group_messages')
+        .delete()
+        .eq('id', messageId)
+        .eq('user_id', currentUser.id)
+
+      if (deleteError) throw deleteError
+    } catch (err) {
+      setMessages(previousMessages)
+      setError(err instanceof Error ? err.message : 'No se pudo eliminar el mensaje')
+    } finally {
+      setDeletingMessageId(null)
+    }
+  }
+
   const handleChangeMemberRole = async (targetUserId: string, nextRole: 'admin' | 'member') => {
     if (!isCurrentUserAdmin || !currentUser || updatingRoleUserId) return
     if (targetUserId === currentUser.id) return
@@ -602,7 +632,18 @@ export default function GroupDetailPage() {
                   messages.map((message) => (
                     <div key={message.id} className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 mb-1">
-                        <span className="text-sm font-semibold text-slate-800">{message.users?.name || 'Miembro'}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-slate-800">{message.users?.name || 'Miembro'}</span>
+                          {currentUser && message.user_id === currentUser.id && (
+                            <button
+                              onClick={() => handleDeleteMessage(message.id)}
+                              disabled={deletingMessageId === message.id}
+                              className="text-xs px-2 py-0.5 rounded-full border border-rose-200 text-rose-700 bg-rose-50 hover:bg-rose-100 disabled:opacity-50"
+                            >
+                              {deletingMessageId === message.id ? 'Eliminando...' : 'Eliminar'}
+                            </button>
+                          )}
+                        </div>
                         <span className="text-xs text-slate-500">{new Date(message.created_at).toLocaleString()}</span>
                       </div>
                       <p className="text-sm text-slate-700 whitespace-pre-wrap">{message.message}</p>
