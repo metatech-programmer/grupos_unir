@@ -74,7 +74,8 @@ export default function GroupDetailPage() {
         if (groupError) throw groupError
         setGroup(groupData)
 
-        const authId = sessionData.session?.user?.id
+        const authUser = sessionData.session?.user
+        const authId = authUser?.id
         setCanDelete(Boolean(authId && groupData?.created_by_auth === authId))
 
         if (!authId) {
@@ -87,13 +88,40 @@ export default function GroupDetailPage() {
           return
         }
 
-        const { data: userData, error: userError } = await supabase
+        const { data: existingUser, error: userError } = await supabase
           .from('users')
           .select('*')
           .eq('auth_id', authId)
           .single()
 
-        if (userError) throw userError
+        if (userError && userError.code !== 'PGRST116') throw userError
+
+        let userData = existingUser
+        if (!userData) {
+          const { data: createdUser, error: createError } = await supabase
+            .from('users')
+            .upsert([
+              {
+                auth_id: authId,
+                name: authUser?.user_metadata?.name || authUser?.email || 'Usuario',
+                email: authUser?.email || '',
+                phone: authUser?.user_metadata?.phone || null,
+                country: authUser?.user_metadata?.country || 'other',
+                timezone: authUser?.user_metadata?.timezone || 'Europe/Madrid',
+                work_status: authUser?.user_metadata?.work_status || 'student',
+                daily_hours: authUser?.user_metadata?.daily_hours || 2,
+                availability_start: authUser?.user_metadata?.availability_start || 18,
+                availability_end: authUser?.user_metadata?.availability_end || 22,
+                activities: authUser?.user_metadata?.activities || ['Backend'],
+              },
+            ], { onConflict: 'auth_id' })
+            .select('*')
+            .single()
+
+          if (createError || !createdUser) throw createError || new Error('No se pudo crear el perfil de usuario')
+          userData = createdUser
+        }
+
         setCurrentUser(userData)
 
         const { data: membershipData, error: membershipError } = await supabase
@@ -102,9 +130,35 @@ export default function GroupDetailPage() {
           .eq('group_id', groupId)
           .eq('user_id', userData.id)
 
-        if (membershipError) throw membershipError
+        if (membershipError && membershipError.code !== 'PGRST116') {
+          console.warn('Membership check warning:', membershipError)
+        }
 
-        const memberOfGroup = Boolean(membershipData && membershipData.length > 0)
+        let hasMembershipRow = Boolean(membershipData && membershipData.length > 0)
+        const isMemberByGroupState = Boolean(
+          (groupData.members || []).includes(userData.id) || userData.group_id === groupId,
+        )
+
+        if (!hasMembershipRow && isMemberByGroupState) {
+          const inferredRole: 'admin' | 'member' = groupData.created_by_auth === authId ? 'admin' : 'member'
+          const { error: repairError } = await supabase
+            .from('group_members')
+            .upsert([
+              {
+                user_id: userData.id,
+                group_id: groupId,
+                role: inferredRole,
+              },
+            ], { onConflict: 'user_id,group_id' })
+
+          if (repairError) {
+            console.warn('Could not auto-repair group membership:', repairError)
+          } else {
+            hasMembershipRow = true
+          }
+        }
+
+        const memberOfGroup = hasMembershipRow || isMemberByGroupState
         setIsMember(memberOfGroup)
 
         if (!memberOfGroup) {
