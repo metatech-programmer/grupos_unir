@@ -150,62 +150,64 @@ export default function InstallAppButton({ className }: InstallAppButtonProps) {
 
         {showHelpModal && (
           <div
-            className="fixed inset-0 z-[70] bg-slate-950/50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[70] bg-slate-950/50"
             onClick={closeHelpModal}
             role="presentation"
           >
-            <div
-              className="card w-full max-w-lg transition-all duration-200 ease-out opacity-100 translate-y-0"
-              onClick={(event) => event.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              aria-label={`Instalar en ${browserLabel}`}
-            >
-              <h3 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'var(--font-sora)' }}>
-                Instalar en {browserLabel}
-              </h3>
-              <p className="text-sm text-slate-600 mt-2">
-                Sigue estos pasos para instalar GrupoFlow como app.
-              </p>
+            <div className="h-dvh w-full grid place-items-center p-4 overflow-y-auto">
+              <div
+                className="card w-full max-w-lg max-h-[90dvh] overflow-y-auto transition-all duration-200 ease-out opacity-100 translate-y-0"
+                onClick={(event) => event.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-label={`Instalar en ${browserLabel}`}
+              >
+                <h3 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'var(--font-sora)' }}>
+                  Instalar en {browserLabel}
+                </h3>
+                <p className="text-sm text-slate-600 mt-2">
+                  Sigue estos pasos para instalar GrupoFlow como app.
+                </p>
 
-              <div className="mt-4 grid sm:grid-cols-3 gap-2">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  <span className="inline-flex items-center justify-center h-6 min-w-6 px-2 rounded-full bg-slate-900 text-white text-[10px] font-bold">IOS</span>
-                  <p className="text-xs font-semibold text-slate-700">iOS / Safari</p>
-                  <p className="text-[11px] text-slate-600 mt-1">Compartir {'->'} Agregar a pantalla de inicio</p>
+                <div className="mt-4 grid sm:grid-cols-3 gap-2">
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                    <span className="inline-flex items-center justify-center h-6 min-w-6 px-2 rounded-full bg-slate-900 text-white text-[10px] font-bold">IOS</span>
+                    <p className="text-xs font-semibold text-slate-700">iOS / Safari</p>
+                    <p className="text-[11px] text-slate-600 mt-1">Compartir {'->'} Agregar a pantalla de inicio</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                    <span className="inline-flex items-center justify-center h-6 min-w-6 px-2 rounded-full bg-slate-900 text-white text-[10px] font-bold">AND</span>
+                    <p className="text-xs font-semibold text-slate-700">Android</p>
+                    <p className="text-[11px] text-slate-600 mt-1">Menu {'->'} Instalar app o Agregar a inicio</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                    <span className="inline-flex items-center justify-center h-6 min-w-6 px-2 rounded-full bg-slate-900 text-white text-[10px] font-bold">WEB</span>
+                    <p className="text-xs font-semibold text-slate-700">Desktop</p>
+                    <p className="text-[11px] text-slate-600 mt-1">Icono de instalar en barra o menu</p>
+                  </div>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  <span className="inline-flex items-center justify-center h-6 min-w-6 px-2 rounded-full bg-slate-900 text-white text-[10px] font-bold">AND</span>
-                  <p className="text-xs font-semibold text-slate-700">Android</p>
-                  <p className="text-[11px] text-slate-600 mt-1">Menu {'->'} Instalar app o Agregar a inicio</p>
+
+                <ol className="mt-4 space-y-2 text-sm text-slate-700 list-decimal list-inside">
+                  {instructions.map((step) => (
+                    <li key={step}>{step}</li>
+                  ))}
+                </ol>
+
+                <label className="mt-4 flex items-center gap-2 text-sm text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={hideHelp}
+                    onChange={toggleHideHelp}
+                    className="h-4 w-4 rounded border-slate-300"
+                  />
+                  No mostrar esta guía de nuevo
+                </label>
+
+                <div className="mt-5 flex justify-end gap-2">
+                  <button type="button" className="btn-outline text-sm" onClick={closeHelpModal}>
+                    Cerrar
+                  </button>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  <span className="inline-flex items-center justify-center h-6 min-w-6 px-2 rounded-full bg-slate-900 text-white text-[10px] font-bold">WEB</span>
-                  <p className="text-xs font-semibold text-slate-700">Desktop</p>
-                  <p className="text-[11px] text-slate-600 mt-1">Icono de instalar en barra o menu</p>
-                </div>
-              </div>
-
-              <ol className="mt-4 space-y-2 text-sm text-slate-700 list-decimal list-inside">
-                {instructions.map((step) => (
-                  <li key={step}>{step}</li>
-                ))}
-              </ol>
-
-              <label className="mt-4 flex items-center gap-2 text-sm text-slate-600">
-                <input
-                  type="checkbox"
-                  checked={hideHelp}
-                  onChange={toggleHideHelp}
-                  className="h-4 w-4 rounded border-slate-300"
-                />
-                No mostrar esta guía de nuevo
-              </label>
-
-              <div className="mt-5 flex justify-end gap-2">
-                <button type="button" className="btn-outline text-sm" onClick={closeHelpModal}>
-                  Cerrar
-                </button>
               </div>
             </div>
           </div>
