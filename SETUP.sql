@@ -81,6 +81,21 @@ CREATE TABLE IF NOT EXISTS group_messages (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE OR REPLACE FUNCTION public.current_user_profile_id()
+RETURNS UUID
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT id
+  FROM public.users
+  WHERE auth_id = auth.uid()
+  LIMIT 1;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.current_user_profile_id() TO authenticated;
+
 CREATE OR REPLACE FUNCTION public.handle_auth_user_sync()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -187,12 +202,13 @@ CREATE POLICY users_select_policy ON users
 CREATE POLICY users_select_group_members_policy ON users
   FOR SELECT
   USING (
+    auth.uid() IS NOT NULL
+    AND
     EXISTS (
       SELECT 1
-      FROM users me
-      JOIN group_members gm_me ON gm_me.user_id = me.id
+      FROM group_members gm_me
       JOIN group_members gm_target ON gm_target.group_id = gm_me.group_id
-      WHERE me.auth_id = auth.uid()
+      WHERE gm_me.user_id = public.current_user_profile_id()
         AND gm_target.user_id = users.id
     )
   );
@@ -230,9 +246,8 @@ CREATE POLICY group_members_select_policy ON group_members
   USING (
     EXISTS (
       SELECT 1
-      FROM users me
-      JOIN group_members gm_me ON gm_me.user_id = me.id
-      WHERE me.auth_id = auth.uid()
+      FROM group_members gm_me
+      WHERE gm_me.user_id = public.current_user_profile_id()
         AND gm_me.group_id = group_members.group_id
     )
   );
@@ -240,23 +255,13 @@ CREATE POLICY group_members_select_policy ON group_members
 CREATE POLICY group_members_insert_policy ON group_members
   FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1
-      FROM users u
-      WHERE u.id = group_members.user_id
-        AND u.auth_id = auth.uid()
-    )
+    group_members.user_id = public.current_user_profile_id()
   );
 
 CREATE POLICY group_members_delete_policy ON group_members
   FOR DELETE
   USING (
-    EXISTS (
-      SELECT 1
-      FROM users u
-      WHERE u.id = group_members.user_id
-        AND u.auth_id = auth.uid()
-    )
+    group_members.user_id = public.current_user_profile_id()
   );
 
 CREATE POLICY group_members_update_policy ON group_members
@@ -264,9 +269,8 @@ CREATE POLICY group_members_update_policy ON group_members
   USING (
     EXISTS (
       SELECT 1
-      FROM users me
-      JOIN group_members gm_me ON gm_me.user_id = me.id
-      WHERE me.auth_id = auth.uid()
+      FROM group_members gm_me
+      WHERE gm_me.user_id = public.current_user_profile_id()
         AND gm_me.group_id = group_members.group_id
         AND gm_me.role = 'admin'
     )
@@ -274,9 +278,8 @@ CREATE POLICY group_members_update_policy ON group_members
   WITH CHECK (
     EXISTS (
       SELECT 1
-      FROM users me
-      JOIN group_members gm_me ON gm_me.user_id = me.id
-      WHERE me.auth_id = auth.uid()
+      FROM group_members gm_me
+      WHERE gm_me.user_id = public.current_user_profile_id()
         AND gm_me.group_id = group_members.group_id
         AND gm_me.role = 'admin'
     )
@@ -287,9 +290,8 @@ CREATE POLICY group_messages_select_policy ON group_messages
   USING (
     EXISTS (
       SELECT 1
-      FROM users me
-      JOIN group_members gm_me ON gm_me.user_id = me.id
-      WHERE me.auth_id = auth.uid()
+      FROM group_members gm_me
+      WHERE gm_me.user_id = public.current_user_profile_id()
         AND gm_me.group_id = group_messages.group_id
     )
   );
@@ -299,10 +301,9 @@ CREATE POLICY group_messages_insert_policy ON group_messages
   WITH CHECK (
     EXISTS (
       SELECT 1
-      FROM users me
-      JOIN group_members gm_me ON gm_me.user_id = me.id
-      WHERE me.auth_id = auth.uid()
-        AND me.id = group_messages.user_id
+      FROM group_members gm_me
+      WHERE gm_me.user_id = public.current_user_profile_id()
+        AND group_messages.user_id = public.current_user_profile_id()
         AND gm_me.group_id = group_messages.group_id
     )
   );
