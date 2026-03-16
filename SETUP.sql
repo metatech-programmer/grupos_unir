@@ -96,6 +96,41 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.current_user_profile_id() TO authenticated;
 
+CREATE OR REPLACE FUNCTION public.is_member_of_group(target_group_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.group_members gm
+    WHERE gm.user_id = public.current_user_profile_id()
+      AND gm.group_id = target_group_id
+  );
+$$;
+
+GRANT EXECUTE ON FUNCTION public.is_member_of_group(UUID) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.is_admin_of_group(target_group_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.group_members gm
+    WHERE gm.user_id = public.current_user_profile_id()
+      AND gm.group_id = target_group_id
+      AND gm.role = 'admin'
+  );
+$$;
+
+GRANT EXECUTE ON FUNCTION public.is_admin_of_group(UUID) TO authenticated;
+
 CREATE OR REPLACE FUNCTION public.handle_auth_user_sync()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -243,14 +278,7 @@ CREATE POLICY groups_delete_policy ON groups
 -- group_members: allow only operations over rows owned by the auth user
 CREATE POLICY group_members_select_policy ON group_members
   FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1
-      FROM group_members gm_me
-      WHERE gm_me.user_id = public.current_user_profile_id()
-        AND gm_me.group_id = group_members.group_id
-    )
-  );
+  USING (public.is_member_of_group(group_members.group_id));
 
 CREATE POLICY group_members_insert_policy ON group_members
   FOR INSERT
@@ -266,44 +294,16 @@ CREATE POLICY group_members_delete_policy ON group_members
 
 CREATE POLICY group_members_update_policy ON group_members
   FOR UPDATE
-  USING (
-    EXISTS (
-      SELECT 1
-      FROM group_members gm_me
-      WHERE gm_me.user_id = public.current_user_profile_id()
-        AND gm_me.group_id = group_members.group_id
-        AND gm_me.role = 'admin'
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1
-      FROM group_members gm_me
-      WHERE gm_me.user_id = public.current_user_profile_id()
-        AND gm_me.group_id = group_members.group_id
-        AND gm_me.role = 'admin'
-    )
-  );
+  USING (public.is_admin_of_group(group_members.group_id))
+  WITH CHECK (public.is_admin_of_group(group_members.group_id));
 
 CREATE POLICY group_messages_select_policy ON group_messages
   FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1
-      FROM group_members gm_me
-      WHERE gm_me.user_id = public.current_user_profile_id()
-        AND gm_me.group_id = group_messages.group_id
-    )
-  );
+  USING (public.is_member_of_group(group_messages.group_id));
 
 CREATE POLICY group_messages_insert_policy ON group_messages
   FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1
-      FROM group_members gm_me
-      WHERE gm_me.user_id = public.current_user_profile_id()
-        AND group_messages.user_id = public.current_user_profile_id()
-        AND gm_me.group_id = group_messages.group_id
-    )
+    public.is_member_of_group(group_messages.group_id)
+    AND group_messages.user_id = public.current_user_profile_id()
   );
