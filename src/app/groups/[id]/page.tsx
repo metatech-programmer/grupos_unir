@@ -31,6 +31,17 @@ const normalizeMessages = (rawMessages: unknown[]): MessageWithAuthor[] => {
   })
 }
 
+const getFirstName = (fullName: string) => {
+  return fullName.trim().split(' ')[0] || fullName
+}
+
+const getInitials = (fullName: string) => {
+  const parts = fullName.trim().split(' ').filter(Boolean)
+  if (parts.length === 0) return 'U'
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+}
+
 export default function GroupDetailPage() {
   const router = useRouter()
   const params = useParams()
@@ -620,21 +631,44 @@ export default function GroupDetailPage() {
         </section>
 
         <section className="card mb-6">
-          <h2 className="text-lg font-bold mb-3">Chat del grupo</h2>
+          <div className="flex items-center justify-between mb-3 gap-3">
+            <h2 className="text-lg font-bold">Chat del grupo</h2>
+            <span className="text-xs px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-600 font-semibold">
+              {messages.length} {messages.length === 1 ? 'mensaje' : 'mensajes'}
+            </span>
+          </div>
           {!isMember ? (
             <p className="text-slate-600 text-sm">Debes pertenecer a este grupo para usar el chat en tiempo real.</p>
           ) : (
             <>
-              <div ref={messagesContainerRef} className="max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 space-y-2 mb-3">
+              <div ref={messagesContainerRef} className="h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-3 sm:p-4 space-y-3 mb-3">
                 {messages.length === 0 ? (
-                  <p className="text-sm text-slate-500">Todavia no hay mensajes. Rompe el hielo con el primero.</p>
+                  <div className="h-full flex items-center justify-center text-center">
+                    <p className="text-sm text-slate-500 max-w-xs">Todavia no hay mensajes. Rompe el hielo con el primero.</p>
+                  </div>
                 ) : (
-                  messages.map((message) => (
-                    <div key={message.id} className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 mb-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-slate-800">{message.users?.name || 'Miembro'}</span>
-                          {currentUser && message.user_id === currentUser.id && (
+                  messages.map((message) => {
+                    const isOwnMessage = Boolean(currentUser && message.user_id === currentUser.id)
+                    const authorName = message.users?.name || 'Miembro'
+
+                    return (
+                      <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[88%] sm:max-w-[75%] ${isOwnMessage ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+                          <div className="flex items-center gap-2 text-xs text-slate-500">
+                            {!isOwnMessage && (
+                              <span className="h-6 w-6 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-[10px]">
+                                {getInitials(authorName)}
+                              </span>
+                            )}
+                            <span className="font-semibold">{isOwnMessage ? 'Tu' : getFirstName(authorName)}</span>
+                            <span>{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+
+                          <div className={`rounded-2xl px-3 py-2 shadow-sm border ${isOwnMessage ? 'bg-blue-600 text-white border-blue-500 rounded-br-md' : 'bg-white text-slate-800 border-slate-200 rounded-bl-md'}`}>
+                            <p className="text-sm whitespace-pre-wrap break-words">{message.message}</p>
+                          </div>
+
+                          {isOwnMessage && (
                             <button
                               onClick={() => handleDeleteMessage(message.id)}
                               disabled={deletingMessageId === message.id}
@@ -644,19 +678,24 @@ export default function GroupDetailPage() {
                             </button>
                           )}
                         </div>
-                        <span className="text-xs text-slate-500">{new Date(message.created_at).toLocaleString()}</span>
                       </div>
-                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{message.message}</p>
+                    )
+                  })
+                )}
+
+                {typingUsers.length > 0 && (
+                  <div className="flex justify-start">
+                    <div className="max-w-[80%] flex flex-col gap-1 items-start">
+                      <span className="text-xs text-slate-500 font-semibold">{typingUsers.join(', ')}</span>
+                      <div className="rounded-2xl rounded-bl-md px-3 py-2 border border-slate-200 bg-white shadow-sm flex items-center gap-1.5">
+                        <span className="typing-dot" />
+                        <span className="typing-dot typing-dot-delay-1" />
+                        <span className="typing-dot typing-dot-delay-2" />
+                      </div>
                     </div>
-                  ))
+                  </div>
                 )}
               </div>
-
-              {typingUsers.length > 0 && (
-                <p className="text-xs text-slate-500 mb-3">
-                  {typingUsers.join(', ')} {typingUsers.length === 1 ? 'esta escribiendo...' : 'estan escribiendo...'}
-                </p>
-              )}
 
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
