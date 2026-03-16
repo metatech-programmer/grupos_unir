@@ -99,6 +99,12 @@ export default function RegisterPage() {
 
       if (authError) throw authError
 
+      const identitiesCount = authData.user?.identities?.length ?? 0
+      if (authData.user && identitiesCount === 0) {
+        setError('Este correo ya esta registrado. Inicia sesion o recupera tu contrasena.')
+        return
+      }
+
       if (authData.user) {
         if (!authData.session) {
           setShowConfirmModal(true)
