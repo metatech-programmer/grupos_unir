@@ -135,40 +135,25 @@ export default function CreateGroupPage() {
       if (formData.active_hours_end <= formData.active_hours_start) throw new Error('El horario del grupo no es valido')
       if (formData.activity_focus.length === 0) throw new Error('Selecciona al menos una actividad objetivo')
 
-      const user = await ensureUserProfile()
+      await ensureUserProfile()
       const selectedSubject = formData.subject === 'Otro' ? formData.customSubject.trim() : formData.subject
       if (!selectedSubject) throw new Error('Selecciona o escribe una asignatura')
 
-      const { data: createdGroup, error: groupError } = await supabase
-        .from('groups')
-        .insert([
-          {
-            name: formData.name.trim(),
-            subject: selectedSubject,
-            created_by_auth: user.auth_id,
-            members: [user.id],
-            member_count: 1,
-            max_size: formData.max_size,
-            timezone_coverage: [user.timezone],
-            preferred_work_style: formData.preferred_work_style,
-            required_daily_hours: formData.required_daily_hours,
-            active_hours_start: formData.active_hours_start,
-            active_hours_end: formData.active_hours_end,
-            activity_focus: formData.activity_focus,
-            pros: ['Horario inicial definido', 'Foco de trabajo claro'],
-            cons: ['Aun faltan integrantes para completar el equipo'],
-          },
-        ])
-        .select('*')
-        .single()
+      const { data: createdGroupId, error: createGroupError } = await supabase.rpc('create_group_atomic', {
+        p_name: formData.name.trim(),
+        p_subject: selectedSubject,
+        p_max_size: formData.max_size,
+        p_preferred_work_style: formData.preferred_work_style,
+        p_required_daily_hours: formData.required_daily_hours,
+        p_active_hours_start: formData.active_hours_start,
+        p_active_hours_end: formData.active_hours_end,
+        p_activity_focus: formData.activity_focus,
+        p_pros: ['Horario inicial definido', 'Foco de trabajo claro'],
+        p_cons: ['Aun faltan integrantes para completar el equipo'],
+      })
 
-      if (groupError || !createdGroup) throw groupError || new Error('No se pudo crear el grupo')
-
-      const { error: updateUserError } = await supabase.from('users').update({ group_id: createdGroup.id }).eq('id', user.id)
-      if (updateUserError) throw updateUserError
-
-      await supabase.from('group_members').upsert([{ user_id: user.id, group_id: createdGroup.id, role: 'admin' }])
-      router.push(`/groups/${createdGroup.id}`)
+      if (createGroupError || !createdGroupId) throw createGroupError || new Error('No se pudo crear el grupo')
+      router.push(`/groups/${createdGroupId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error creando grupo')
     } finally {

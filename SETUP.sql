@@ -7,6 +7,8 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 DROP TRIGGER IF EXISTS on_auth_user_created_or_updated ON auth.users;
 
 DROP FUNCTION IF EXISTS public.handle_auth_user_sync() CASCADE;
+DROP FUNCTION IF EXISTS public.create_group_atomic(TEXT, TEXT, INT, TEXT, INT, INT, INT, TEXT[], TEXT[], TEXT[]) CASCADE;
+DROP FUNCTION IF EXISTS public.join_group_atomic(UUID) CASCADE;
 DROP FUNCTION IF EXISTS public.is_admin_of_group(UUID) CASCADE;
 DROP FUNCTION IF EXISTS public.is_member_of_group(UUID) CASCADE;
 DROP FUNCTION IF EXISTS public.current_user_profile_id() CASCADE;
@@ -214,6 +216,171 @@ BEGIN
   RETURN NEW;
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION public.create_group_atomic(
+  p_name TEXT,
+  p_subject TEXT,
+  p_max_size INT,
+  p_preferred_work_style TEXT,
+  p_required_daily_hours INT,
+  p_active_hours_start INT,
+  p_active_hours_end INT,
+  p_activity_focus TEXT[],
+  p_pros TEXT[],
+  p_cons TEXT[]
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_user_id UUID;
+  v_auth_id UUID;
+  v_timezone TEXT;
+  v_group_id UUID;
+BEGIN
+  v_user_id := public.current_user_profile_id();
+
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Perfil de usuario no encontrado para auth.uid()=%', auth.uid();
+  END IF;
+
+  SELECT auth_id, timezone
+  INTO v_auth_id, v_timezone
+  FROM public.users
+  WHERE id = v_user_id
+  FOR UPDATE;
+
+  IF v_auth_id IS NULL THEN
+    RAISE EXCEPTION 'No se pudo recuperar auth_id del usuario actual';
+  END IF;
+
+  INSERT INTO public.groups (
+    name,
+    subject,
+    created_by_auth,
+    members,
+    member_count,
+    max_size,
+    preferred_work_style,
+    required_daily_hours,
+    active_hours_start,
+    active_hours_end,
+    activity_focus,
+    timezone_coverage,
+    pros,
+    cons
+  )
+  VALUES (
+    p_name,
+    p_subject,
+    v_auth_id,
+    ARRAY[v_user_id::TEXT],
+    1,
+    p_max_size,
+    p_preferred_work_style,
+    p_required_daily_hours,
+    p_active_hours_start,
+    p_active_hours_end,
+    COALESCE(p_activity_focus, ARRAY[]::TEXT[]),
+    ARRAY[COALESCE(v_timezone, 'Europe/Madrid')],
+    COALESCE(p_pros, ARRAY[]::TEXT[]),
+    COALESCE(p_cons, ARRAY[]::TEXT[])
+  )
+  RETURNING id INTO v_group_id;
+
+  INSERT INTO public.group_members (user_id, group_id, role)
+  VALUES (v_user_id, v_group_id, 'admin')
+  ON CONFLICT (user_id, group_id) DO UPDATE SET role = EXCLUDED.role;
+
+  UPDATE public.users
+  SET group_id = v_group_id
+  WHERE id = v_user_id;
+
+  RETURN v_group_id;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.create_group_atomic(TEXT, TEXT, INT, TEXT, INT, INT, INT, TEXT[], TEXT[], TEXT[]) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.join_group_atomic(p_group_id UUID)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_user_id UUID;
+  v_group groups%ROWTYPE;
+BEGIN
+  v_user_id := public.current_user_profile_id();
+
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Perfil de usuario no encontrado para auth.uid()=%', auth.uid();
+  END IF;
+
+  SELECT *
+  INTO v_group
+  FROM public.groups
+  WHERE id = p_group_id
+  FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Grupo no encontrado';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM public.group_members
+    WHERE user_id = v_user_id
+      AND group_id = p_group_id
+  ) THEN
+    UPDATE public.users
+    SET group_id = p_group_id
+    WHERE id = v_user_id;
+
+    RETURN p_group_id;
+  END IF;
+
+  IF v_group.member_count >= v_group.max_size THEN
+    RAISE EXCEPTION 'El grupo ya esta lleno';
+  END IF;
+
+  INSERT INTO public.group_members (user_id, group_id, role)
+  VALUES (v_user_id, p_group_id, 'member')
+  ON CONFLICT (user_id, group_id) DO NOTHING;
+
+  UPDATE public.users
+  SET group_id = p_group_id
+  WHERE id = v_user_id;
+
+  UPDATE public.groups g
+  SET
+    member_count = (
+      SELECT COUNT(*)::INT
+      FROM public.group_members gm
+      WHERE gm.group_id = p_group_id
+    ),
+    members = (
+      SELECT COALESCE(ARRAY_AGG(gm.user_id::TEXT ORDER BY gm.joined_at), ARRAY[]::TEXT[])
+      FROM public.group_members gm
+      WHERE gm.group_id = p_group_id
+    ),
+    timezone_coverage = (
+      SELECT COALESCE(ARRAY_AGG(DISTINCT COALESCE(u.timezone, 'Europe/Madrid')), ARRAY[]::TEXT[])
+      FROM public.group_members gm
+      JOIN public.users u ON u.id = gm.user_id
+      WHERE gm.group_id = p_group_id
+    ),
+    updated_at = CURRENT_TIMESTAMP
+  WHERE g.id = p_group_id;
+
+  RETURN p_group_id;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.join_group_atomic(UUID) TO authenticated;
 
 DROP TRIGGER IF EXISTS on_auth_user_created_or_updated ON auth.users;
 

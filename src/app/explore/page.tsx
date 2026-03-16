@@ -172,25 +172,10 @@ export default function ExplorePage() {
 
       if (targetGroup.member_count >= targetGroup.max_size) throw new Error('El grupo ya esta lleno')
 
-      const { error: updateError } = await supabase.from('users').update({ group_id: groupId }).eq('id', user.id)
-      if (updateError) throw updateError
+      const { error: joinError } = await supabase
+        .rpc('join_group_atomic', { p_group_id: groupId })
 
-      const { error: groupError } = await supabase
-        .from('groups')
-        .update({
-          member_count: targetGroup.member_count + 1,
-          members: [...(targetGroup.members || []), user.id],
-          timezone_coverage: Array.from(new Set([...(targetGroup.timezone_coverage || []), user.timezone])),
-        })
-        .eq('id', groupId)
-
-      if (groupError) throw groupError
-
-      const { error: memberError } = await supabase
-        .from('group_members')
-        .upsert([{ user_id: user.id, group_id: groupId, role: 'member' }])
-
-      if (memberError) throw memberError
+      if (joinError) throw joinError
       router.push(`/groups/${groupId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al unirse al grupo')
