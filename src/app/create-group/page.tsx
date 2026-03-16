@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { supabase, User } from '@/lib/supabase'
 import { SUBJECTS } from '@/lib/subjects'
 import { ACTIVITIES, DAILY_HOURS, WORK_STATUS, SCHEDULE_SLOTS } from '@/lib/profile-options'
@@ -263,7 +262,6 @@ export default function CreateGroupPage() {
             <button type="submit" disabled={loading} className="btn-primary w-full sm:w-auto disabled:opacity-50">
               {loading ? 'Creando grupo...' : 'Crear Grupo'}
             </button>
-            <Link href="/explore" className="btn-outline w-full sm:w-auto">Volver a explorar</Link>
           </div>
         </form>
       </div>

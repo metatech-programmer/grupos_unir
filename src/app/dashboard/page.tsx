@@ -91,11 +91,6 @@ export default function DashboardPage() {
     checkAuth()
   }, [router, mounted])
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-  }
-
   if (!mounted || loading) {
     return <LoadingScreen title="Cargando panel" subtitle="Sincronizando tus datos y tu grupo..." />
   }
@@ -114,7 +109,6 @@ export default function DashboardPage() {
             <p className="text-slate-600 text-sm">Hola, {user.name}</p>
           </div>
         </div>
-        <button onClick={handleLogout} className="btn-outline text-sm w-full sm:w-auto">Cerrar sesion</button>
       </header>
 
       <main className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-6">

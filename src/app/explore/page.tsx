@@ -204,16 +204,6 @@ export default function ExplorePage() {
               <p className="text-slate-600 text-sm">IA gratuita local: horario, trabajo, actividades y tiempo diario.</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full lg:w-auto lg:justify-end">
-            {user ? (
-              <>
-                <Link href="/create-group" className="btn-outline w-full sm:w-auto">Crear grupo</Link>
-                <Link href="/dashboard" className="btn-outline w-full sm:w-auto">Dashboard</Link>
-              </>
-            ) : (
-              <Link href="/login" className="btn-outline w-full sm:w-auto sm:col-span-2">Iniciar sesion</Link>
-            )}
-          </div>
         </header>
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}

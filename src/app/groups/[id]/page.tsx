@@ -493,7 +493,7 @@ export default function GroupDetailPage() {
               <p className="text-slate-600">{group.subject}</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full md:w-auto md:justify-end">
+          <div className="w-full md:w-auto md:justify-end">
             {canDelete && (
               <button
                 onClick={handleDeleteGroup}
@@ -503,7 +503,6 @@ export default function GroupDetailPage() {
                 {deleting ? 'Eliminando...' : 'Eliminar grupo'}
               </button>
             )}
-            <Link href="/explore" className="btn-outline w-full sm:w-auto">Volver</Link>
           </div>
         </header>
 
