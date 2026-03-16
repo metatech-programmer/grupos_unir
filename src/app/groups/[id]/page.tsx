@@ -16,6 +16,8 @@ type GroupMemberWithRole = {
   user: User
 }
 
+const isTemporaryMessageId = (messageId: string) => messageId.startsWith('temp-')
+
 const normalizeMessages = (rawMessages: unknown[]): MessageWithAuthor[] => {
   return rawMessages.map((row) => {
     const typedRow = row as GroupMessage & { users?: unknown }
@@ -399,6 +401,7 @@ export default function GroupDetailPage() {
 
   const handleDeleteMessage = async (messageId: string) => {
     if (!currentUser || deletingMessageId) return
+    if (isTemporaryMessageId(messageId)) return
 
     const targetMessage = messages.find((message) => message.id === messageId)
     if (!targetMessage || targetMessage.user_id !== currentUser.id) return
@@ -687,7 +690,7 @@ export default function GroupDetailPage() {
                             <p className="text-sm whitespace-pre-wrap break-words">{message.message}</p>
                           </div>
 
-                          {isOwnMessage && (
+                          {isOwnMessage && !isTemporaryMessageId(message.id) && (
                             <button
                               onClick={() => handleDeleteMessage(message.id)}
                               disabled={deletingMessageId === message.id}
