@@ -52,6 +52,12 @@ export default function GroupDetailPage() {
   const [mounted, setMounted] = useState(false)
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!messagesContainerRef.current) return
+    messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+  }, [messages])
 
   useEffect(() => {
     setMounted(true)
@@ -313,7 +319,26 @@ export default function GroupDetailPage() {
   }
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !currentUser || !isMember || sending) return
+    const trimmedMessage = newMessage.trim()
+    if (!trimmedMessage || !currentUser || !isMember || sending) return
+
+    const tempId = `temp-${Date.now()}`
+    const optimisticMessage: MessageWithAuthor = {
+      id: tempId,
+      group_id: groupId,
+      user_id: currentUser.id,
+      message: trimmedMessage,
+      created_at: new Date().toISOString(),
+      users: {
+        id: currentUser.id,
+        name: currentUser.name,
+        email: currentUser.email,
+        phone: currentUser.phone,
+      },
+    }
+
+    setMessages((prev) => [...prev, optimisticMessage])
+    setNewMessage('')
 
     try {
       setSending(true)
@@ -322,17 +347,18 @@ export default function GroupDetailPage() {
         .insert({
           group_id: groupId,
           user_id: currentUser.id,
-          message: newMessage.trim(),
+          message: trimmedMessage,
         })
 
       if (insertError) throw insertError
-      setNewMessage('')
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current)
         typingTimeoutRef.current = null
       }
       await updateTypingState(false)
     } catch (err) {
+      setMessages((prev) => prev.filter((message) => message.id !== tempId))
+      setNewMessage(trimmedMessage)
       setError(err instanceof Error ? err.message : 'No se pudo enviar el mensaje')
     } finally {
       setSending(false)
@@ -569,7 +595,7 @@ export default function GroupDetailPage() {
             <p className="text-slate-600 text-sm">Debes pertenecer a este grupo para usar el chat en tiempo real.</p>
           ) : (
             <>
-              <div className="max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 space-y-2 mb-3">
+              <div ref={messagesContainerRef} className="max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 space-y-2 mb-3">
                 {messages.length === 0 ? (
                   <p className="text-sm text-slate-500">Todavia no hay mensajes. Rompe el hielo con el primero.</p>
                 ) : (
