@@ -23,12 +23,20 @@ const urlBase64ToUint8Array = (base64String: string) => {
 export default function PushNotificationsToggle({ className }: PushNotificationsToggleProps) {
   const [enabled, setEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [requiresIosInstall, setRequiresIosInstall] = useState(false)
 
   const isSupported = useMemo(() => {
     return typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window
   }, [])
 
   useEffect(() => {
+    const ua = navigator.userAgent.toLowerCase()
+    const isIOS = /iphone|ipad|ipod/.test(ua)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+      || (window.navigator as Navigator & { standalone?: boolean }).standalone === true
+
+    setRequiresIosInstall(isIOS && !isStandalone)
+
     const init = async () => {
       if (!isSupported) return
 
@@ -51,6 +59,11 @@ export default function PushNotificationsToggle({ className }: PushNotifications
 
   const enableNotifications = async () => {
     if (!isSupported || loading) return
+
+    if (requiresIosInstall) {
+      alert('En iOS primero instala la app en pantalla de inicio y luego activa notificaciones desde la app instalada.')
+      return
+    }
 
     const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
     if (!vapidPublicKey) {

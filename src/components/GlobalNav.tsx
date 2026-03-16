@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase, User as AppUser } from '@/lib/supabase'
 import { TeamIcon } from '@/components/icons'
 import PushNotificationsToggle from '@/components/PushNotificationsToggle'
+import ThemeToggle from '@/components/ThemeToggle'
+import InstallAppButton from '@/components/InstallAppButton'
 
 type NavLink = {
   href: string
@@ -65,11 +67,12 @@ export default function GlobalNav() {
     const authLinks: NavLink[] = [
       { href: '/dashboard', label: 'Dashboard' },
       { href: '/create-group', label: 'Crear grupo' },
+      { href: '/settings', label: 'Ajustes' },
       { href: '/register', label: 'Perfil' },
     ]
 
     if (profile?.group_id) {
-      authLinks.splice(2, 0, { href: `/groups/${profile.group_id}`, label: 'Mi grupo' })
+      authLinks.splice(3, 0, { href: `/groups/${profile.group_id}`, label: 'Mi grupo' })
     }
 
     return [...base, ...authLinks]
@@ -82,21 +85,21 @@ export default function GlobalNav() {
   }
 
   const desktopLinkClass = (href: string) => {
-    const active = pathname === href
+    const active = pathname === href || pathname?.startsWith(`${href}/`)
     return active
       ? 'px-3 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold'
       : 'px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 text-sm font-semibold'
   }
 
   const mobileLinkClass = (href: string) => {
-    const active = pathname === href
+    const active = pathname === href || pathname?.startsWith(`${href}/`)
     return active
       ? 'px-3 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold'
       : 'px-3 py-2 rounded-lg bg-slate-50 text-slate-700 text-sm font-semibold'
   }
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
           <span className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center">
@@ -105,7 +108,7 @@ export default function GlobalNav() {
           <span className="text-slate-900 font-bold" style={{ fontFamily: 'var(--font-sora)' }}>GrupoFlow</span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-1">
           {links.map((link) => (
             <Link key={link.href} href={link.href} className={desktopLinkClass(link.href)}>
               {link.label}
@@ -116,6 +119,8 @@ export default function GlobalNav() {
         <div className="hidden md:flex items-center gap-2">
           {authId ? (
             <>
+              <ThemeToggle className="btn-outline text-sm" />
+              <InstallAppButton className="btn-outline text-sm" />
               <PushNotificationsToggle className="btn-outline text-sm" />
               <span className="text-xs text-slate-500 font-semibold px-2 py-1 rounded-md bg-slate-100">
                 {profile?.name ? profile.name.split(' ')[0] : 'Cuenta'}
@@ -124,6 +129,7 @@ export default function GlobalNav() {
             </>
           ) : (
             <>
+              <ThemeToggle className="btn-outline text-sm" />
               <Link href="/login" className="btn-outline text-sm">Iniciar sesión</Link>
               <Link href="/register" className="btn-primary text-sm">Crear cuenta</Link>
             </>
@@ -157,6 +163,10 @@ export default function GlobalNav() {
                 {link.label}
               </Link>
             ))}
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <ThemeToggle className="btn-outline w-full text-sm" />
+            <InstallAppButton className="btn-outline w-full text-sm" />
           </div>
           <div className="flex items-center gap-2">
             {authId ? (
