@@ -383,7 +383,7 @@ export default function GroupDetailPage() {
     const targetMessage = messages.find((message) => message.id === messageId)
     if (!targetMessage || targetMessage.user_id !== currentUser.id) return
 
-    const confirmed = window.confirm('Deseas eliminar este mensaje?')
+    const confirmed = window.confirm('¿Deseas eliminar este mensaje?')
     if (!confirmed) return
 
     const previousMessages = messages
@@ -436,7 +436,7 @@ export default function GroupDetailPage() {
   const handleDeleteGroup = async () => {
     if (!group || !canDelete || deleting) return
 
-    const confirmed = window.confirm('Esta accion eliminara el grupo. Deseas continuar?')
+    const confirmed = window.confirm('Esta acción eliminará el grupo. ¿Deseas continuar?')
     if (!confirmed) return
 
     try {
@@ -572,10 +572,10 @@ export default function GroupDetailPage() {
           <h2 className="text-lg font-bold mb-3">Integrantes y contacto</h2>
           {!isMember ? (
             <p className="text-slate-600 text-sm">
-              Debes pertenecer a este grupo para ver correo, telefono y enlaces directos de contacto.
+              Debes pertenecer a este grupo para ver correo, teléfono y enlaces directos de contacto.
             </p>
           ) : members.length === 0 ? (
-            <p className="text-slate-600 text-sm">Aun no hay miembros visibles.</p>
+            <p className="text-slate-600 text-sm">Aún no hay miembros visibles.</p>
           ) : (
             <div className="space-y-3">
               {members.map((member) => (
@@ -643,7 +643,7 @@ export default function GroupDetailPage() {
               <div ref={messagesContainerRef} className="h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-3 sm:p-4 space-y-3 mb-3">
                 {messages.length === 0 ? (
                   <div className="h-full flex items-center justify-center text-center">
-                    <p className="text-sm text-slate-500 max-w-xs">Todavia no hay mensajes. Rompe el hielo con el primero.</p>
+                    <p className="text-sm text-slate-500 max-w-xs">Todavía no hay mensajes. Rompe el hielo con el primero.</p>
                   </div>
                 ) : (
                   messages.map((message) => {
@@ -659,7 +659,7 @@ export default function GroupDetailPage() {
                                 {getInitials(authorName)}
                               </span>
                             )}
-                            <span className="font-semibold">{isOwnMessage ? 'Tu' : getFirstName(authorName)}</span>
+                            <span className="font-semibold">{isOwnMessage ? 'Tú' : getFirstName(authorName)}</span>
                             <span>{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
 

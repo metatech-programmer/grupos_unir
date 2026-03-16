@@ -5,7 +5,7 @@ interface LoadingScreenProps {
 
 export default function LoadingScreen({
   title = 'Preparando tu espacio',
-  subtitle = 'Sincronizando informacion en tiempo real...',
+  subtitle = 'Sincronizando información en tiempo real...',
 }: LoadingScreenProps) {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">

@@ -37,7 +37,7 @@ export default function LoginPage() {
       if (authError) throw authError
       router.push('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al iniciar sesion')
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesión')
     } finally {
       setLoading(false)
     }
@@ -65,16 +65,16 @@ export default function LoginPage() {
             <input type="email" name="email" value={formData.email} onChange={handleChange} className="input-modern" placeholder="tu@email.com" required />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Contrasena</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
             <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-modern" placeholder="********" required />
           </div>
           <button type="submit" disabled={loading} className="w-full btn-primary disabled:opacity-50">
-            {loading ? 'Ingresando...' : 'Iniciar sesion'}
+            {loading ? 'Ingresando...' : 'Iniciar sesión'}
           </button>
         </form>
 
         <p className="text-center mt-6 text-gray-600">
-          No tienes cuenta? <Link href="/register" className="text-blue-600 font-semibold hover:underline">Crear perfil</Link>
+          ¿No tienes cuenta? <Link href="/register" className="text-blue-600 font-semibold hover:underline">Crear perfil</Link>
         </p>
       </div>
     </div>

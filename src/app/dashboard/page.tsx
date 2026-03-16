@@ -105,7 +105,7 @@ export default function DashboardPage() {
             <TeamIcon className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Panel de Coordinacion</h1>
+            <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Panel de Coordinación</h1>
             <p className="text-slate-600 text-sm">Hola, {user.name}</p>
           </div>
         </div>
@@ -116,10 +116,10 @@ export default function DashboardPage() {
           <h2 className="font-semibold text-lg mb-4" style={{ fontFamily: 'var(--font-sora)' }}>Perfil de trabajo</h2>
           <div className="space-y-2 text-sm text-slate-700">
             <p><strong>Nombre:</strong> {user.name}</p>
-            <p><strong>Pais:</strong> {user.country}</p>
+            <p><strong>País:</strong> {user.country}</p>
             <p><strong>Zona horaria:</strong> {user.timezone}</p>
             <p><strong>Trabajo:</strong> {user.work_status}</p>
-            <p><strong>Horas al dia:</strong> {user.daily_hours}</p>
+            <p><strong>Horas al día:</strong> {user.daily_hours}</p>
             <p><strong>Horario:</strong> {String(user.availability_start).padStart(2, '0')}:00 - {String(user.availability_end).padStart(2, '0')}:00</p>
             <p><strong>Actividades:</strong> {(user.activities || []).join(', ')}</p>
           </div>
@@ -130,13 +130,13 @@ export default function DashboardPage() {
           <div className="grid md:grid-cols-3 gap-4 mb-4">
             <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
               <BrainIcon className="h-5 w-5 text-slate-700" />
-              <p className="text-sm text-slate-600 mt-2">Recomendacion IA</p>
+              <p className="text-sm text-slate-600 mt-2">Recomendación IA</p>
               <p className="font-semibold">Activa y gratuita</p>
             </div>
             <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
               <ClockIcon className="h-5 w-5 text-slate-700" />
               <p className="text-sm text-slate-600 mt-2">Disponibilidad</p>
-              <p className="font-semibold">{user.daily_hours}h por dia</p>
+              <p className="font-semibold">{user.daily_hours} h por día</p>
             </div>
             <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
               <ActivityIcon className="h-5 w-5 text-slate-700" />

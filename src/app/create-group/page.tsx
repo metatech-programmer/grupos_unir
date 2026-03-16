@@ -68,7 +68,7 @@ export default function CreateGroupPage() {
     const authUser = session?.user
 
     if (authError || !authUser) {
-      throw new Error('Debes iniciar sesion para crear un grupo')
+      throw new Error('Debes iniciar sesión para crear un grupo')
     }
 
     const { data: existingUser, error: userQueryError } = await supabase
@@ -92,7 +92,7 @@ export default function CreateGroupPage() {
           .select('*')
           .single()
 
-        if (syncError || !syncedUser) throw syncError || new Error('No fue posible sincronizar telefono')
+        if (syncError || !syncedUser) throw syncError || new Error('No fue posible sincronizar teléfono')
         return syncedUser as User
       }
 
@@ -131,7 +131,7 @@ export default function CreateGroupPage() {
     try {
       if (!formData.name.trim()) throw new Error('El nombre del grupo es obligatorio')
       if (formData.max_size < 3 || formData.max_size > 5) throw new Error('El grupo debe tener entre 3 y 5 integrantes')
-      if (formData.active_hours_end <= formData.active_hours_start) throw new Error('El horario del grupo no es valido')
+      if (formData.active_hours_end <= formData.active_hours_start) throw new Error('El horario del grupo no es válido')
       if (formData.activity_focus.length === 0) throw new Error('Selecciona al menos una actividad objetivo')
 
       await ensureUserProfile()
@@ -148,7 +148,7 @@ export default function CreateGroupPage() {
         p_active_hours_end: formData.active_hours_end,
         p_activity_focus: formData.activity_focus,
         p_pros: ['Horario inicial definido', 'Foco de trabajo claro'],
-        p_cons: ['Aun faltan integrantes para completar el equipo'],
+        p_cons: ['Aún faltan integrantes para completar el equipo'],
       })
 
       if (createGroupError || !createdGroupId) throw createGroupError || new Error('No se pudo crear el grupo')
@@ -161,7 +161,7 @@ export default function CreateGroupPage() {
   }
 
   if (!mounted || !authChecked) {
-    return <LoadingScreen title="Preparando creador" subtitle="Cargando configuracion del nuevo grupo..." />
+    return <LoadingScreen title="Preparando creador" subtitle="Cargando configuración del nuevo grupo..." />
   }
 
   return (
@@ -202,7 +202,7 @@ export default function CreateGroupPage() {
 
           <div className="grid md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Maximo integrantes</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Máximo integrantes</label>
               <select name="max_size" value={formData.max_size} onChange={handleChange} className="input-modern">
                 <option value={3}>3 integrantes</option>
                 <option value={4}>4 integrantes</option>
@@ -217,7 +217,7 @@ export default function CreateGroupPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Horas recomendadas al dia</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Horas recomendadas al día</label>
               <select name="required_daily_hours" value={formData.required_daily_hours} onChange={handleChange} className="input-modern">
                 {DAILY_HOURS.map(h => <option key={h} value={h}>{h} horas</option>)}
               </select>

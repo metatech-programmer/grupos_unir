@@ -76,7 +76,7 @@ export default function RegisterPage() {
 
     try {
       if (formData.password !== formData.confirmPassword) {
-        setError('Las contrasenas no coinciden')
+        setError('Las contraseñas no coinciden')
         return
       }
 
@@ -120,13 +120,13 @@ export default function RegisterPage() {
 
       const identitiesCount = authData.user?.identities?.length ?? 0
       if (authData.user && identitiesCount === 0) {
-        setError('Este correo ya esta registrado. Inicia sesion o recupera tu contrasena.')
+        setError('Este correo ya está registrado. Inicia sesión o recupera tu contraseña.')
         return
       }
 
       if (authData.user) {
         if (!authData.session) {
-          setError('En este proyecto aun esta activa la verificacion por correo. Desactiva Confirm email en Supabase Auth para registrar sin confirmacion.')
+          setError('En este proyecto aún está activa la verificación por correo. Desactiva Confirm email en Supabase Auth para registrar sin confirmación.')
           return
         }
 
@@ -154,7 +154,7 @@ export default function RegisterPage() {
 
       if (typedError?.status === 429 || typedError?.code === 'over_email_send_rate_limit') {
         setRetryAfterSeconds(60)
-        setError('Has alcanzado el limite temporal de correos de verificacion. Espera 60s y vuelve a intentar.')
+        setError('Has alcanzado el límite temporal de correos de verificación. Espera 60 s y vuelve a intentarlo.')
       } else {
         setError(err instanceof Error ? err.message : 'Error al registrarse')
       }
@@ -173,7 +173,7 @@ export default function RegisterPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
           <div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Crear Perfil Operativo</h2>
-            <p className="text-slate-600 mt-2">La distribucion inteligente usa horario, carga diaria, trabajo y actividades.</p>
+            <p className="text-slate-600 mt-2">La distribución inteligente usa horario, carga diaria, trabajo y actividades.</p>
           </div>
           <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">
             <SparkIcon className="h-6 w-6" />
@@ -197,16 +197,16 @@ export default function RegisterPage() {
               <input type="email" name="email" value={formData.email} onChange={handleChange} className="input-modern" placeholder="tu@email.com" required />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Numero (WhatsApp)</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Número (WhatsApp)</label>
               <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="input-modern" placeholder="+573001112233" required />
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Pais</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">País</label>
               <select name="country" value={formData.country} onChange={handleChange} className="input-modern" required>
-                <option value="">Selecciona tu pais</option>
+                <option value="">Selecciona tu país</option>
                 {COUNTRIES.map(country => (
                   <option key={country.value} value={country.value}>{country.label}</option>
                 ))}
@@ -224,7 +224,7 @@ export default function RegisterPage() {
 
           <div className="grid md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Situacion Laboral</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Situación Laboral</label>
               <select name="work_status" value={formData.work_status} onChange={handleChange} className="input-modern">
                 {WORK_STATUS.map(option => (
                   <option key={option.value} value={option.value}>{option.label}</option>
@@ -232,7 +232,7 @@ export default function RegisterPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Horas por Dia</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Horas por día</label>
               <select name="daily_hours" value={formData.daily_hours} onChange={handleChange} className="input-modern">
                 {DAILY_HOURS.map(h => (
                   <option key={h} value={h}>{h} horas</option>
@@ -283,11 +283,11 @@ export default function RegisterPage() {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Contrasena</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
               <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-modern" placeholder="********" required />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Confirmar Contrasena</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Confirmar contraseña</label>
               <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="input-modern" placeholder="********" required />
             </div>
           </div>
@@ -298,9 +298,9 @@ export default function RegisterPage() {
         </form>
 
         <p className="text-center mt-6 text-gray-600">
-          Ya tienes cuenta?{' '}
+          ¿Ya tienes cuenta?{' '}
           <Link href="/login" className="text-blue-600 font-semibold hover:underline">
-            Inicia sesion
+            Inicia sesión
           </Link>
         </p>
       </div>

@@ -24,8 +24,8 @@ export default function ExplorePage() {
       group,
       compatibility_score: 50,
       pros: group.pros || ['Grupo disponible para revisar'],
-      cons: group.cons || ['Inicia sesion para ver recomendacion personalizada'],
-      recommendation_reason: 'Vista publica activa. Inicia sesion para recomendaciones personalizadas con IA.',
+      cons: group.cons || ['Inicia sesión para ver recomendación personalizada'],
+      recommendation_reason: 'Vista pública activa. Inicia sesión para recomendaciones personalizadas con IA.',
     }))
   }, [])
 
@@ -170,7 +170,7 @@ export default function ExplorePage() {
         return
       }
 
-      if (targetGroup.member_count >= targetGroup.max_size) throw new Error('El grupo ya esta lleno')
+      if (targetGroup.member_count >= targetGroup.max_size) throw new Error('El grupo ya está lleno')
 
       const { error: joinError } = await supabase
         .rpc('join_group_atomic', { p_group_id: groupId })
@@ -246,11 +246,11 @@ export default function ExplorePage() {
                   </div>
                   <div className="text-sm text-slate-600 md:text-right">
                     <p>{suggestion.group.member_count}/{suggestion.group.max_size} integrantes</p>
-                    <p>{suggestion.group.required_daily_hours}h recomendadas por dia</p>
+                    <p>{suggestion.group.required_daily_hours} h recomendadas por día</p>
                   </div>
                 </div>
 
-                <p className="text-slate-700 mb-4"><strong>Recomendacion:</strong> {suggestion.recommendation_reason}</p>
+                <p className="text-slate-700 mb-4"><strong>Recomendación:</strong> {suggestion.recommendation_reason}</p>
 
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
                   <div>
@@ -268,7 +268,7 @@ export default function ExplorePage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:justify-items-start">
-                  <button onClick={() => handleJoinGroup(suggestion.group.id)} className="btn-primary w-full sm:w-auto">{user ? 'Unirme a este grupo' : 'Inicia sesion para unirte'}</button>
+                  <button onClick={() => handleJoinGroup(suggestion.group.id)} className="btn-primary w-full sm:w-auto">{user ? 'Unirme a este grupo' : 'Inicia sesión para unirte'}</button>
                   <Link href={`/groups/${suggestion.group.id}`} className="btn-outline w-full sm:w-auto">Ver detalle</Link>
                 </div>
               </article>

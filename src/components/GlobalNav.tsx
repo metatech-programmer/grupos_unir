@@ -118,11 +118,11 @@ export default function GlobalNav() {
               <span className="text-xs text-slate-500 font-semibold px-2 py-1 rounded-md bg-slate-100">
                 {profile?.name ? profile.name.split(' ')[0] : 'Cuenta'}
               </span>
-              <button onClick={handleLogout} className="btn-outline text-sm">Cerrar sesion</button>
+              <button onClick={handleLogout} className="btn-outline text-sm">Cerrar sesión</button>
             </>
           ) : (
             <>
-              <Link href="/login" className="btn-outline text-sm">Iniciar sesion</Link>
+              <Link href="/login" className="btn-outline text-sm">Iniciar sesión</Link>
               <Link href="/register" className="btn-primary text-sm">Crear cuenta</Link>
             </>
           )}
@@ -132,7 +132,7 @@ export default function GlobalNav() {
           type="button"
           onClick={() => setMobileOpen((prev) => !prev)}
           className="md:hidden h-10 w-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center"
-          aria-label="Abrir menu"
+          aria-label="Abrir menú"
         >
           <span className="flex flex-col gap-1.5">
             <span className="h-0.5 w-4 bg-slate-700" />
@@ -159,11 +159,11 @@ export default function GlobalNav() {
           <div className="flex items-center gap-2">
             {authId ? (
               <>
-                <button onClick={handleLogout} className="btn-outline w-full text-sm">Cerrar sesion</button>
+                <button onClick={handleLogout} className="btn-outline w-full text-sm">Cerrar sesión</button>
               </>
             ) : (
               <>
-                <Link href="/login" className="btn-outline w-full text-sm" onClick={() => setMobileOpen(false)}>Iniciar sesion</Link>
+                <Link href="/login" className="btn-outline w-full text-sm" onClick={() => setMobileOpen(false)}>Iniciar sesión</Link>
                 <Link href="/register" className="btn-primary w-full text-sm" onClick={() => setMobileOpen(false)}>Crear cuenta</Link>
               </>
             )}
