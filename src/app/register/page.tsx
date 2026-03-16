@@ -13,8 +13,8 @@ export default function RegisterPage() {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [retryAfterSeconds, setRetryAfterSeconds] = useState(0)
   const [error, setError] = useState('')
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,6 +33,16 @@ export default function RegisterPage() {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (retryAfterSeconds <= 0) return
+
+    const timer = setInterval(() => {
+      setRetryAfterSeconds((prev) => Math.max(prev - 1, 0))
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [retryAfterSeconds])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -56,6 +66,12 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (retryAfterSeconds > 0) {
+      setError(`Espera ${retryAfterSeconds}s antes de intentar de nuevo.`)
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -110,7 +126,7 @@ export default function RegisterPage() {
 
       if (authData.user) {
         if (!authData.session) {
-          setShowConfirmModal(true)
+          setError('En este proyecto aun esta activa la verificacion por correo. Desactiva Confirm email en Supabase Auth para registrar sin confirmacion.')
           return
         }
 
@@ -134,7 +150,14 @@ export default function RegisterPage() {
         router.push('/dashboard')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al registrarse')
+      const typedError = err as { message?: string; code?: string; status?: number }
+
+      if (typedError?.status === 429 || typedError?.code === 'over_email_send_rate_limit') {
+        setRetryAfterSeconds(60)
+        setError('Has alcanzado el limite temporal de correos de verificacion. Espera 60s y vuelve a intentar.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Error al registrarse')
+      }
     } finally {
       setLoading(false)
     }
@@ -269,8 +292,8 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <button type="submit" disabled={loading} className="w-full btn-primary disabled:opacity-50">
-            {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
+          <button type="submit" disabled={loading || retryAfterSeconds > 0} className="w-full btn-primary disabled:opacity-50">
+            {loading ? 'Creando cuenta...' : retryAfterSeconds > 0 ? `Reintentar en ${retryAfterSeconds}s` : 'Crear Cuenta'}
           </button>
         </form>
 
@@ -281,35 +304,6 @@ export default function RegisterPage() {
           </Link>
         </p>
       </div>
-
-      {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/55 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
-            <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-sora)' }}>
-              Cuenta creada
-            </h3>
-            <p className="mt-3 text-slate-600">
-              Revisa tu correo para confirmar la cuenta y luego inicia sesion.
-            </p>
-            <div className="mt-6 flex gap-3">
-              <button
-                type="button"
-                onClick={() => router.push('/login')}
-                className="btn-primary flex-1"
-              >
-                Ir a iniciar sesion
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowConfirmModal(false)}
-                className="btn-outline flex-1"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
