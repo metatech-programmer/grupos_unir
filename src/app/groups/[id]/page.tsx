@@ -663,7 +663,7 @@ export default function GroupDetailPage() {
             <p className="text-slate-600 text-sm">Debes pertenecer a este grupo para usar el chat en tiempo real.</p>
           ) : (
             <>
-              <div ref={messagesContainerRef} className="h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-3 sm:p-4 space-y-3 mb-3">
+              <div ref={messagesContainerRef} className="chat-surface h-80 overflow-y-auto rounded-2xl border border-slate-200 p-3 sm:p-4 space-y-3 mb-3">
                 {messages.length === 0 ? (
                   <div className="h-full flex items-center justify-center text-center">
                     <p className="text-sm text-slate-500 max-w-xs">Todavía no hay mensajes. Rompe el hielo con el primero.</p>
