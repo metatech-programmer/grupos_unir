@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   title: 'Grupos - Organizador de Equipos de Trabajo',
   description: 'Plataforma inteligente para formar grupos de trabajo óptimos considerando horarios y zonas horarias',
   manifest: '/manifest.webmanifest',
+  icons: {
+    icon: '/icons/icon-192.png',
+    apple: '/icons/apple-touch-icon.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

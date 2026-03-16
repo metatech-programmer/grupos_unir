@@ -6,14 +6,21 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim())
 })
 
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return
+
+  // Keep service worker control active for installability checks while using network-first.
+  event.respondWith(fetch(event.request).catch(() => caches.match(event.request)))
+})
+
 self.addEventListener('push', (event) => {
   if (!event.data) return
 
   let payload = {
     title: 'GrupoFlow',
     body: 'Tienes una nueva notificacion',
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/badge-72.png',
     url: '/',
   }
 

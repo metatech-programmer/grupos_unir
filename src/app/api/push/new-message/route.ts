@@ -97,8 +97,8 @@ export async function POST(request: NextRequest) {
     const notificationPayload = JSON.stringify({
       title: groupName ? `Nuevo mensaje en ${groupName}` : 'Nuevo mensaje de grupo',
       body: `${profile.name}: ${String(message).slice(0, 120)}`,
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/badge-72.png',
       url: `/groups/${groupId}`,
     })
 
