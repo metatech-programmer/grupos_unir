@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-soft: #f4f6fb;
+  --ink-strong: #0f172a;
+  --ink-muted: #475569;
+  --line: #d9e2f1;
+  --brand-900: #102a43;
+  --brand-700: #1f4d7a;
+  --brand-500: #2b6cb0;
+  --brand-300: #79b8ff;
+  --mint-500: #15b79e;
+}
+
+body {
+  color: var(--ink-strong);
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(43, 108, 176, 0.18), transparent),
+    radial-gradient(900px 400px at 100% 0%, rgba(21, 183, 158, 0.14), transparent),
+    var(--bg-soft);
+}
+
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-5 py-2.5 rounded-xl text-white font-semibold transition-all duration-200;
+    background: linear-gradient(135deg, var(--brand-700), var(--brand-500));
+    box-shadow: 0 8px 30px rgba(16, 42, 67, 0.22);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 36px rgba(16, 42, 67, 0.26);
+  }
+
+  .btn-secondary {
+    @apply px-5 py-2.5 rounded-xl text-white font-semibold transition-all duration-200;
+    background: linear-gradient(135deg, #0f766e, var(--mint-500));
+    box-shadow: 0 8px 24px rgba(15, 118, 110, 0.2);
+  }
+
+  .btn-outline {
+    @apply px-5 py-2.5 rounded-xl border font-semibold transition-all duration-200;
+    border-color: var(--line);
+    color: var(--brand-700);
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--brand-300);
+    background-color: #fff;
+  }
+
+  .card {
+    @apply rounded-2xl p-6;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: 0 14px 50px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(5px);
+  }
+
+  .input-modern {
+    @apply w-full px-4 py-2.5 rounded-xl border transition-all duration-200;
+    border-color: var(--line);
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+
+  .input-modern:focus {
+    outline: none;
+    border-color: var(--brand-300);
+    box-shadow: 0 0 0 4px rgba(121, 184, 255, 0.25);
+  }
+
+  .hero-grid {
+    background-image:
+      linear-gradient(to right, rgba(15, 23, 42, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .loader-orbit {
+    animation: orbit-spin 1.8s linear infinite;
+    transform-origin: center;
+  }
+
+  .loader-pulse {
+    animation: pulse-glow 1.6s ease-in-out infinite;
+  }
+}
