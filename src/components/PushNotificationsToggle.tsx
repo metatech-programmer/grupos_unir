@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { BellIcon } from '@/components/icons'
 
 type PushNotificationsToggleProps = {
   className?: string
+  compact?: boolean
 }
 
 const urlBase64ToUint8Array = (base64String: string) => {
@@ -20,7 +22,7 @@ const urlBase64ToUint8Array = (base64String: string) => {
   return outputArray
 }
 
-export default function PushNotificationsToggle({ className }: PushNotificationsToggleProps) {
+export default function PushNotificationsToggle({ className, compact = false }: PushNotificationsToggleProps) {
   const [enabled, setEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
   const [requiresIosInstall, setRequiresIosInstall] = useState(false)
@@ -173,8 +175,17 @@ export default function PushNotificationsToggle({ className }: PushNotifications
       onClick={enabled ? disableNotifications : enableNotifications}
       disabled={loading}
       className={`${baseClass} ${enabled ? 'border-emerald-300 text-emerald-700 bg-emerald-50' : ''}`}
+      aria-label={label}
+      title={label}
     >
-      {label}
+      {compact ? (
+        <span className="inline-flex items-center justify-center relative">
+          <BellIcon className="h-4 w-4" />
+          {enabled && <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500" />}
+        </span>
+      ) : (
+        label
+      )}
     </button>
   )
 }

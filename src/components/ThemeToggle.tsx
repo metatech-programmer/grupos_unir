@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { applyThemeMode, persistThemeMode, readThemeMode, ThemeMode } from '@/lib/theme'
+import { MoonIcon, SunIcon } from '@/components/icons'
 
 type ThemeToggleProps = {
   className?: string
+  compact?: boolean
 }
 
-export default function ThemeToggle({ className }: ThemeToggleProps) {
+export default function ThemeToggle({ className, compact = false }: ThemeToggleProps) {
   const [mode, setMode] = useState<ThemeMode>('light')
 
   useEffect(() => {
@@ -33,7 +35,13 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
       aria-label={label}
       title={label}
     >
-      {mode === 'light' ? 'Claro' : 'Oscuro'}
+      {compact ? (
+        <span className="inline-flex items-center justify-center">
+          {mode === 'light' ? <MoonIcon className="h-4 w-4" /> : <SunIcon className="h-4 w-4" />}
+        </span>
+      ) : (
+        mode === 'light' ? 'Claro' : 'Oscuro'
+      )}
     </button>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { CheckIcon, DownloadIcon } from '@/components/icons'
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>
@@ -9,9 +10,10 @@ type BeforeInstallPromptEvent = Event & {
 
 type InstallAppButtonProps = {
   className?: string
+  compact?: boolean
 }
 
-export default function InstallAppButton({ className }: InstallAppButtonProps) {
+export default function InstallAppButton({ className, compact = false }: InstallAppButtonProps) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [installed, setInstalled] = useState(false)
   const [browserLabel, setBrowserLabel] = useState('tu navegador')
@@ -130,8 +132,8 @@ export default function InstallAppButton({ className }: InstallAppButtonProps) {
 
   if (installed) {
     return (
-      <button type="button" className={className || 'btn-outline text-sm'} disabled>
-        App instalada
+      <button type="button" className={className || 'btn-outline text-sm'} disabled aria-label="App instalada" title="App instalada">
+        {compact ? <CheckIcon className="h-4 w-4" /> : 'App instalada'}
       </button>
     )
   }
@@ -144,8 +146,9 @@ export default function InstallAppButton({ className }: InstallAppButtonProps) {
           onClick={showManualInstructions}
           className={className || 'btn-outline text-sm'}
           title={hideHelp ? 'Guia oculta. Activala en Ajustes si la necesitas.' : 'Ver guia de instalacion'}
+          aria-label="Instalar app"
         >
-          Instalar app
+          {compact ? <DownloadIcon className="h-4 w-4" /> : 'Instalar app'}
         </button>
 
         {showHelpModal && (
@@ -217,8 +220,14 @@ export default function InstallAppButton({ className }: InstallAppButtonProps) {
   }
 
   return (
-    <button type="button" onClick={handleInstall} className={className || 'btn-outline text-sm'}>
-      Instalar app
+    <button
+      type="button"
+      onClick={handleInstall}
+      className={className || 'btn-outline text-sm'}
+      aria-label="Instalar app"
+      title="Instalar app"
+    >
+      {compact ? <DownloadIcon className="h-4 w-4" /> : 'Instalar app'}
     </button>
   )
 }

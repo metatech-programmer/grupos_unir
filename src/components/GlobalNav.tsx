@@ -4,14 +4,27 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { supabase, User as AppUser } from '@/lib/supabase'
-import { TeamIcon } from '@/components/icons'
+import {
+  CloseIcon,
+  CompassIcon,
+  GridIcon,
+  HomeIcon,
+  LogoutIcon,
+  MenuIcon,
+  PlusIcon,
+  SettingsIcon,
+  TeamIcon,
+  UserIcon,
+} from '@/components/icons'
 import PushNotificationsToggle from '@/components/PushNotificationsToggle'
 import ThemeToggle from '@/components/ThemeToggle'
 import InstallAppButton from '@/components/InstallAppButton'
+import type { SVGProps } from 'react'
 
 type NavLink = {
   href: string
   label: string
+  icon: (props: SVGProps<SVGSVGElement>) => JSX.Element
 }
 
 export default function GlobalNav() {
@@ -56,8 +69,8 @@ export default function GlobalNav() {
 
   const links = useMemo<NavLink[]>(() => {
     const base: NavLink[] = [
-      { href: '/', label: 'Inicio' },
-      { href: '/explore', label: 'Explorar' },
+      { href: '/', label: 'Inicio', icon: HomeIcon },
+      { href: '/explore', label: 'Explorar', icon: CompassIcon },
     ]
 
     if (!authId) {
@@ -65,14 +78,14 @@ export default function GlobalNav() {
     }
 
     const authLinks: NavLink[] = [
-      { href: '/dashboard', label: 'Dashboard' },
-      { href: '/create-group', label: 'Crear grupo' },
-      { href: '/settings', label: 'Ajustes' },
-      { href: '/register', label: 'Perfil' },
+      { href: '/dashboard', label: 'Dashboard', icon: GridIcon },
+      { href: '/create-group', label: 'Crear grupo', icon: PlusIcon },
+      { href: '/settings', label: 'Ajustes', icon: SettingsIcon },
+      { href: '/register', label: 'Perfil', icon: UserIcon },
     ]
 
     if (profile?.group_id) {
-      authLinks.splice(3, 0, { href: `/groups/${profile.group_id}`, label: 'Mi grupo' })
+      authLinks.splice(2, 0, { href: `/groups/${profile.group_id}`, label: 'Mi grupo', icon: TeamIcon })
     }
 
     return [...base, ...authLinks]
@@ -87,8 +100,8 @@ export default function GlobalNav() {
   const desktopLinkClass = (href: string) => {
     const active = pathname === href || pathname?.startsWith(`${href}/`)
     return active
-      ? 'px-3 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold'
-      : 'px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 text-sm font-semibold'
+      ? 'h-10 px-3 rounded-xl bg-slate-900 text-white text-sm font-semibold inline-flex items-center gap-2'
+      : 'h-10 px-3 rounded-xl text-slate-700 hover:bg-slate-100 text-sm font-semibold inline-flex items-center gap-2'
   }
 
   const mobileLinkClass = (href: string) => {
@@ -105,33 +118,57 @@ export default function GlobalNav() {
           <span className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center">
             <TeamIcon className="h-4.5 w-4.5" />
           </span>
-          <span className="text-slate-900 font-bold" style={{ fontFamily: 'var(--font-sora)' }}>GrupoFlow</span>
+          <span className="text-slate-900 font-bold hidden sm:inline" style={{ fontFamily: 'var(--font-sora)' }}>GrupoFlow</span>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-1.5 p-1 rounded-2xl border border-slate-200 bg-white/80">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className={desktopLinkClass(link.href)}>
-              {link.label}
-            </Link>
+            <div key={link.href} className="relative group">
+              <Link href={link.href} className={desktopLinkClass(link.href)} aria-label={link.label}>
+                <link.icon className="h-4 w-4" />
+                <span className="hidden xl:inline">{link.label}</span>
+              </Link>
+              <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 xl:hidden">
+                {link.label}
+              </span>
+            </div>
           ))}
         </div>
 
         <div className="hidden md:flex items-center gap-2">
           {authId ? (
             <>
-              <ThemeToggle className="btn-outline text-sm" />
-              <InstallAppButton className="btn-outline text-sm" />
-              <PushNotificationsToggle className="btn-outline text-sm" />
-              <span className="text-xs text-slate-500 font-semibold px-2 py-1 rounded-md bg-slate-100">
-                {profile?.name ? profile.name.split(' ')[0] : 'Cuenta'}
-              </span>
-              <button onClick={handleLogout} className="btn-outline text-sm">Cerrar sesión</button>
+              <div className="relative group">
+                <ThemeToggle compact className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-700 inline-flex items-center justify-center" />
+                <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">Tema</span>
+              </div>
+              <div className="relative group">
+                <InstallAppButton compact className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-700 inline-flex items-center justify-center" />
+                <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">Instalar</span>
+              </div>
+              <div className="relative group">
+                <PushNotificationsToggle compact className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-700 inline-flex items-center justify-center" />
+                <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">Notificaciones</span>
+              </div>
+              <div className="relative group">
+                <button
+                  onClick={handleLogout}
+                  className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-700 inline-flex items-center justify-center"
+                  title="Cerrar sesión"
+                  aria-label="Cerrar sesión"
+                >
+                  <LogoutIcon className="h-4 w-4" />
+                </button>
+                <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">Salir</span>
+              </div>
             </>
           ) : (
             <>
-              <ThemeToggle className="btn-outline text-sm" />
-              <Link href="/login" className="btn-outline text-sm">Iniciar sesión</Link>
-              <Link href="/register" className="btn-primary text-sm">Crear cuenta</Link>
+              <div className="relative group">
+                <ThemeToggle compact className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-700 inline-flex items-center justify-center" />
+                <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">Tema</span>
+              </div>
+              <Link href="/login" className="btn-outline text-sm">Entrar</Link>
             </>
           )}
         </div>
@@ -142,11 +179,7 @@ export default function GlobalNav() {
           className="md:hidden h-10 w-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center"
           aria-label="Abrir menú"
         >
-          <span className="flex flex-col gap-1.5">
-            <span className="h-0.5 w-4 bg-slate-700" />
-            <span className="h-0.5 w-4 bg-slate-700" />
-            <span className="h-0.5 w-4 bg-slate-700" />
-          </span>
+          {mobileOpen ? <CloseIcon className="h-4 w-4" /> : <MenuIcon className="h-4 w-4" />}
         </button>
       </div>
 
@@ -160,7 +193,10 @@ export default function GlobalNav() {
                 className={mobileLinkClass(link.href)}
                 onClick={() => setMobileOpen(false)}
               >
-                {link.label}
+                <span className="inline-flex items-center gap-2">
+                  <link.icon className="h-4 w-4" />
+                  {link.label}
+                </span>
               </Link>
             ))}
           </div>
@@ -177,7 +213,7 @@ export default function GlobalNav() {
             ) : (
               <>
                 <Link href="/login" className="btn-outline w-full text-sm" onClick={() => setMobileOpen(false)}>Iniciar sesión</Link>
-                <Link href="/register" className="btn-primary w-full text-sm" onClick={() => setMobileOpen(false)}>Crear cuenta</Link>
+                <Link href="/register" className="btn-primary w-full text-sm" onClick={() => setMobileOpen(false)}>Registro</Link>
               </>
             )}
           </div>
