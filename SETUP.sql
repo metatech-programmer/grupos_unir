@@ -14,6 +14,7 @@ DROP FUNCTION IF EXISTS public.is_member_of_group(UUID) CASCADE;
 DROP FUNCTION IF EXISTS public.current_user_profile_id() CASCADE;
 
 DROP TABLE IF EXISTS public.group_messages CASCADE;
+DROP TABLE IF EXISTS public.push_subscriptions CASCADE;
 DROP TABLE IF EXISTS public.group_members CASCADE;
 DROP TABLE IF EXISTS public.users CASCADE;
 DROP TABLE IF EXISTS public.groups CASCADE;
@@ -97,6 +98,16 @@ CREATE TABLE IF NOT EXISTS group_messages (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   message TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  endpoint TEXT NOT NULL UNIQUE,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE OR REPLACE FUNCTION public.current_user_profile_id()
@@ -398,12 +409,14 @@ CREATE INDEX IF NOT EXISTS idx_group_members_user_id ON group_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_group_members_group_id ON group_members(group_id);
 CREATE INDEX IF NOT EXISTS idx_group_messages_group_id ON group_messages(group_id);
 CREATE INDEX IF NOT EXISTS idx_group_messages_created_at ON group_messages(created_at);
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user_id ON push_subscriptions(user_id);
 
 -- Enable Row Level Security
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE group_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE group_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
 
 -- Make policy creation idempotent
 DROP POLICY IF EXISTS users_select_policy ON users;
@@ -424,6 +437,11 @@ DROP POLICY IF EXISTS group_members_update_policy ON group_members;
 DROP POLICY IF EXISTS group_messages_select_policy ON group_messages;
 DROP POLICY IF EXISTS group_messages_insert_policy ON group_messages;
 DROP POLICY IF EXISTS group_messages_delete_policy ON group_messages;
+
+DROP POLICY IF EXISTS push_subscriptions_select_policy ON push_subscriptions;
+DROP POLICY IF EXISTS push_subscriptions_insert_policy ON push_subscriptions;
+DROP POLICY IF EXISTS push_subscriptions_update_policy ON push_subscriptions;
+DROP POLICY IF EXISTS push_subscriptions_delete_policy ON push_subscriptions;
 
 -- users: each authenticated user can only see and manage their row
 CREATE POLICY users_select_policy ON users
@@ -507,3 +525,20 @@ CREATE POLICY group_messages_insert_policy ON group_messages
 CREATE POLICY group_messages_delete_policy ON group_messages
   FOR DELETE
   USING (group_messages.user_id = public.current_user_profile_id());
+
+CREATE POLICY push_subscriptions_select_policy ON push_subscriptions
+  FOR SELECT
+  USING (push_subscriptions.user_id = public.current_user_profile_id());
+
+CREATE POLICY push_subscriptions_insert_policy ON push_subscriptions
+  FOR INSERT
+  WITH CHECK (push_subscriptions.user_id = public.current_user_profile_id());
+
+CREATE POLICY push_subscriptions_update_policy ON push_subscriptions
+  FOR UPDATE
+  USING (push_subscriptions.user_id = public.current_user_profile_id())
+  WITH CHECK (push_subscriptions.user_id = public.current_user_profile_id());
+
+CREATE POLICY push_subscriptions_delete_policy ON push_subscriptions
+  FOR DELETE
+  USING (push_subscriptions.user_id = public.current_user_profile_id());

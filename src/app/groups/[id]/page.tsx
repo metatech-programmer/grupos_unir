@@ -363,6 +363,26 @@ export default function GroupDetailPage() {
         })
 
       if (insertError) throw insertError
+
+      const { data: sessionData } = await supabase.auth.getSession()
+      const accessToken = sessionData.session?.access_token
+      if (accessToken) {
+        fetch('/api/push/new-message', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            groupId,
+            groupName: group?.name || null,
+            message: trimmedMessage,
+          }),
+        }).catch((notifyError) => {
+          console.warn('No se pudo enviar push de nuevo mensaje:', notifyError)
+        })
+      }
+
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current)
         typingTimeoutRef.current = null

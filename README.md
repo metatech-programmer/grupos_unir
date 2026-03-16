@@ -8,6 +8,8 @@ Una plataforma web moderna para formar grupos de trabajo óptimos considerando z
 - **⏰ Compatibilidad de Horarios**: Agrupa automáticamente personas del mismo horario para mejor coordinación
 - **🌍 Soporte Global**: Soporta múltiples países y zonas horarias (España, Colombia, Perú, Argentina, República Dominicana, etc.)
 - **⚡ Actualizaciones en Tiempo Real**: Ve cambios en tiempo real con Supabase Realtime
+- **📲 PWA Instalable**: Puedes instalar la app en móvil o escritorio como aplicación nativa
+- **🔔 Notificaciones Push**: Recibe avisos de nuevos mensajes incluso cuando no tienes la app abierta
 - **📊 Pantalla de Pros/Contras**: Cada grupo muestra ventajas y desventajas claras
 - **👥 Grupos de 3-5 Miembros**: Tamaño óptimo para trabajo colaborativo
 - **🔐 Autenticación Segura**: Login con Supabase Auth
@@ -108,6 +110,11 @@ Crea un archivo `.env.local` en la raíz del proyecto:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=your-public-vapid-key
+VAPID_PRIVATE_KEY=your-private-vapid-key
+VAPID_SUBJECT=mailto:admin@example.com
 ```
 
 Reemplaza `your-project` y `your-anon-key` con los valores de tu proyecto Supabase:
@@ -115,6 +122,23 @@ Reemplaza `your-project` y `your-anon-key` con los valores de tu proyecto Supaba
 1. En Supabase, ve a **Settings > API**
 2. Copia `Project URL` y `anon public key`
 3. Pégalos en el archivo `.env.local`
+
+### 5. Activar Push Notifications (VAPID)
+
+Genera claves VAPID una sola vez:
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+Copia esas claves en `.env.local`:
+
+- `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
+- `VAPID_PRIVATE_KEY`
+- `VAPID_SUBJECT` (por ejemplo: `mailto:tu-correo@dominio.com`)
+
+Luego ejecuta en Supabase SQL Editor el archivo `PUSH_SETUP.sql`.
+Ese script es no destructivo y solo agrega lo necesario para notificaciones push.
 
 ## 🚀 Ejecutar Localmente
 

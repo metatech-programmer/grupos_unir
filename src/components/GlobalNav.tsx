@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { supabase, User as AppUser } from '@/lib/supabase'
 import { TeamIcon } from '@/components/icons'
+import PushNotificationsToggle from '@/components/PushNotificationsToggle'
 
 type NavLink = {
   href: string
@@ -115,6 +116,7 @@ export default function GlobalNav() {
         <div className="hidden md:flex items-center gap-2">
           {authId ? (
             <>
+              <PushNotificationsToggle className="btn-outline text-sm" />
               <span className="text-xs text-slate-500 font-semibold px-2 py-1 rounded-md bg-slate-100">
                 {profile?.name ? profile.name.split(' ')[0] : 'Cuenta'}
               </span>
@@ -159,6 +161,7 @@ export default function GlobalNav() {
           <div className="flex items-center gap-2">
             {authId ? (
               <>
+                <PushNotificationsToggle className="btn-outline w-full text-sm" />
                 <button onClick={handleLogout} className="btn-outline w-full text-sm">Cerrar sesión</button>
               </>
             ) : (

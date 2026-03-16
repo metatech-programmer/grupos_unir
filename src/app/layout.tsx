@@ -1,7 +1,8 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Sora, Manrope } from 'next/font/google'
 import './globals.css'
 import GlobalNav from '@/components/GlobalNav'
+import PWARegistration from '@/components/PWARegistration'
 
 const sora = Sora({
   subsets: ['latin'],
@@ -16,6 +17,16 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: 'Grupos - Organizador de Equipos de Trabajo',
   description: 'Plataforma inteligente para formar grupos de trabajo óptimos considerando horarios y zonas horarias',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'GrupoFlow',
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#0f172a',
 }
 
 export default function RootLayout({
@@ -26,6 +37,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${sora.variable} ${manrope.variable} bg-gray-50`} style={{ fontFamily: 'var(--font-manrope)' }}>
+        <PWARegistration />
         <GlobalNav />
         <main>{children}</main>
       </body>
