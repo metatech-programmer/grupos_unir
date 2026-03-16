@@ -84,6 +84,20 @@ export default function ExplorePage() {
           if (userQueryError && userQueryError.code !== 'PGRST116') throw userQueryError
 
           userData = existingUser
+          if (userData && (!userData.phone || userData.phone.trim() === '') && authUser.user_metadata?.phone) {
+            const { data: syncedUser, error: syncError } = await supabase
+              .from('users')
+              .update({
+                phone: String(authUser.user_metadata.phone),
+              })
+              .eq('auth_id', authUser.id)
+              .select('*')
+              .single()
+
+            if (syncError) throw syncError
+            userData = syncedUser
+          }
+
           if (!userData) {
             const { data: createdUser, error: createError } = await supabase
               .from('users')
@@ -92,6 +106,7 @@ export default function ExplorePage() {
                   auth_id: authUser.id,
                   name: authUser.user_metadata?.name || authUser.email || 'Usuario',
                   email: authUser.email || '',
+                  phone: authUser.user_metadata?.phone || null,
                   country: authUser.user_metadata?.country || 'other',
                   timezone: authUser.user_metadata?.timezone || 'Europe/Madrid',
                   work_status: authUser.user_metadata?.work_status || 'student',

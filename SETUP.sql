@@ -81,6 +81,70 @@ CREATE TABLE IF NOT EXISTS group_messages (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE OR REPLACE FUNCTION public.handle_auth_user_sync()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  INSERT INTO public.users (
+    auth_id,
+    name,
+    email,
+    phone,
+    country,
+    timezone,
+    work_status,
+    activities,
+    daily_hours,
+    availability_start,
+    availability_end,
+    updated_at
+  )
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'name', NEW.email, 'Usuario'),
+    COALESCE(NEW.email, ''),
+    NEW.raw_user_meta_data->>'phone',
+    NEW.raw_user_meta_data->>'country',
+    COALESCE(NEW.raw_user_meta_data->>'timezone', 'Europe/Madrid'),
+    COALESCE(NEW.raw_user_meta_data->>'work_status', 'student'),
+    COALESCE(
+      ARRAY(SELECT jsonb_array_elements_text(COALESCE(NEW.raw_user_meta_data->'activities', '[]'::jsonb))),
+      ARRAY[]::TEXT[]
+    ),
+    COALESCE((NEW.raw_user_meta_data->>'daily_hours')::INT, 2),
+    COALESCE((NEW.raw_user_meta_data->>'availability_start')::INT, 18),
+    COALESCE((NEW.raw_user_meta_data->>'availability_end')::INT, 22),
+    CURRENT_TIMESTAMP
+  )
+  ON CONFLICT (auth_id)
+  DO UPDATE SET
+    name = EXCLUDED.name,
+    email = EXCLUDED.email,
+    phone = EXCLUDED.phone,
+    country = EXCLUDED.country,
+    timezone = EXCLUDED.timezone,
+    work_status = EXCLUDED.work_status,
+    activities = EXCLUDED.activities,
+    daily_hours = EXCLUDED.daily_hours,
+    availability_start = EXCLUDED.availability_start,
+    availability_end = EXCLUDED.availability_end,
+    updated_at = CURRENT_TIMESTAMP;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_auth_user_created_or_updated ON auth.users;
+
+CREATE TRIGGER on_auth_user_created_or_updated
+  AFTER INSERT OR UPDATE OF email, raw_user_meta_data
+  ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_auth_user_sync();
+
 CREATE INDEX IF NOT EXISTS idx_users_auth_id ON users(auth_id);
 CREATE INDEX IF NOT EXISTS idx_users_group_id ON users(group_id);
 CREATE INDEX IF NOT EXISTS idx_groups_member_count ON groups(member_count);
