@@ -1,182 +1,22 @@
-# 👥 Grupos - Organizador Inteligente de Equipos de Trabajo
+# 👥 Grupos — Organizador inteligente de equipos
 
-Una plataforma web moderna para formar grupos de trabajo óptimos considerando zonas horarias y preferencias, con recomendaciones impulsadas por IA.
+Pequeña aplicación web para formar grupos de trabajo optimizados por zona horaria y preferencias.
 
-## 🚀 Características
+Principales acciones para publicar el repo públicamente:
 
-- **🤖 Recomendaciones por IA**: Algoritmo inteligente que sugiere los mejores grupos según tu zona horaria y preferencias
-- **⏰ Compatibilidad de Horarios**: Agrupa automáticamente personas del mismo horario para mejor coordinación
-- **🌍 Soporte Global**: Soporta múltiples países y zonas horarias (España, Colombia, Perú, Argentina, República Dominicana, etc.)
-- **⚡ Actualizaciones en Tiempo Real**: Ve cambios en tiempo real con Supabase Realtime
-- **📲 PWA Instalable**: Puedes instalar la app en móvil o escritorio como aplicación nativa
-- **🔔 Notificaciones Push**: Recibe avisos de nuevos mensajes incluso cuando no tienes la app abierta
-- **📊 Pantalla de Pros/Contras**: Cada grupo muestra ventajas y desventajas claras
-- **👥 Grupos de 3-5 Miembros**: Tamaño óptimo para trabajo colaborativo
-- **🔐 Autenticación Segura**: Login con Supabase Auth
+- Lee `GETTING_STARTED.md` para arranque rápido y pasos de configuración.
+- Documentación detallada y notas antiguas han sido movidas a `docs/archived-md/`.
+- License: `LICENSE` (MIT).
 
-## 🛠️ Requisitos Previos
+Archivos conservados en la raíz:
 
-- Node.js 18+ 
-- npm o yarn
-- Cuenta de Supabase (https://supabase.com)
-- Vercel (para deployment, opcional)
+- `README.md` (esta versión concisa)
+- `GETTING_STARTED.md` (guía paso a paso)
 
-## 📦 Instalación
+Si necesitas que deje otro documento en la raíz (por ejemplo `ARCHITECTURE.md`), dímelo y lo restauro.
 
-### 1. Clonar o descargar el proyecto
+Advertencia: no subas `.env.local`, contiene datos sensibles.
 
-```bash
-cd grupos
-```
-
-### 2. Instalar dependencias
-
-```bash
-npm install
-```
-
-### 3. Configurar Supabase
-
-#### Crear base de datos en Supabase
-
-1. Ve a [supabase.com](https://supabase.com) y crea una cuenta gratis
-2. Crea un nuevo proyecto
-3. Ve a **SQL Editor** y ejecuta el siguiente script:
-
-```sql
--- Crear tabla de usuarios
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  auth_id UUID NOT NULL UNIQUE,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE,
-  country TEXT,
-  timezone TEXT,
-  group_id UUID,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Crear tabla de grupos
-CREATE TABLE groups (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  subject TEXT NOT NULL,
-  members TEXT[] DEFAULT ARRAY[]::TEXT[],
-  member_count INTEGER DEFAULT 0,
-  max_size INTEGER DEFAULT 5,
-  timezone_coverage TEXT[] DEFAULT ARRAY[]::TEXT[],
-  pros TEXT[] DEFAULT ARRAY[]::TEXT[],
-  cons TEXT[] DEFAULT ARRAY[]::TEXT[],
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Crear tabla de miembros del grupo
-CREATE TABLE group_members (
-  user_id UUID NOT NULL,
-  group_id UUID NOT NULL,
-  joined_at TIMESTAMP DEFAULT NOW(),
-  PRIMARY KEY (user_id, group_id),
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (group_id) REFERENCES groups(id)
-);
-
--- Habilitar Row Level Security
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE groups ENABLE ROW LEVEL SECURITY;
-ALTER TABLE group_members ENABLE ROW LEVEL SECURITY;
-
--- Crear políticas de seguridad
-CREATE POLICY "Users can view their own data"
-  ON users FOR SELECT
-  USING (auth.uid() = auth_id);
-
-CREATE POLICY "Users can update their own data"
-  ON users FOR UPDATE
-  USING (auth.uid() = auth_id);
-
-CREATE POLICY "Anyone can view groups"
-  ON groups FOR SELECT
-  USING (true);
-
-CREATE POLICY "Anyone can view group members"
-  ON group_members FOR SELECT
-  USING (true);
-```
-
-### 4. Configurar variables de entorno
-
-Crea un archivo `.env.local` en la raíz del proyecto:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=your-public-vapid-key
-VAPID_PRIVATE_KEY=your-private-vapid-key
-VAPID_SUBJECT=mailto:admin@example.com
-```
-
-Reemplaza `your-project` y `your-anon-key` con los valores de tu proyecto Supabase:
-
-1. En Supabase, ve a **Settings > API**
-2. Copia `Project URL` y `anon public key`
-3. Pégalos en el archivo `.env.local`
-
-### 5. Activar Push Notifications (VAPID)
-
-Genera claves VAPID una sola vez:
-
-```bash
-npx web-push generate-vapid-keys
-```
-
-Copia esas claves en `.env.local`:
-
-- `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
-- `VAPID_PRIVATE_KEY`
-- `VAPID_SUBJECT` (por ejemplo: `mailto:tu-correo@dominio.com`)
-
-Luego ejecuta en Supabase SQL Editor el archivo `PUSH_SETUP.sql`.
-Ese script es no destructivo y solo agrega lo necesario para notificaciones push.
-
-## 🚀 Ejecutar Localmente
-
-```bash
-npm run dev
-```
-
-La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
-
-## 📱 Uso
-
-### Registrarse
-1. Haz clic en "Registrarse"
-2. Completa tu perfil:
-   - Nombre completo
-   - Email
-   - País
-   - Zona horaria
-3. Establece contraseña
-
-### Encontrar Grupo
-1. Ve a "Explorar Grupos"
-2. La IA te sugerirá grupos basados en tu zona horaria
-3. Cada grupo muestra:
-   - Porcentaje de compatibilidad
-   - Pros (ventajas)
-   - Contras (desventajas)
-   - Miembros actuales
-4. Haz clic en "Unirse a este grupo"
-
-### Ver Tu Grupo
-1. Ve al Dashboard
-2. Haz clic en "Ver Mi Grupo"
-3. Consulta los detalles y miembros
-
-## 🤖 Cómo Funciona el Algoritmo de IA
-
-El sistema de recomendaciones calcula una puntuación de compatibilidad basada en:
 
 - **Compatibilidad de Zona Horaria (40 puntos)**: ¿Tus horarios se solapan?
 - **Tamaño del Grupo (30 puntos)**: Preferencia por grupos de 3-4 miembros
