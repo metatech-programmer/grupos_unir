@@ -89,6 +89,7 @@ export default function GroupDetailPage() {
   const [updatingRoleUserId, setUpdatingRoleUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
+  const [leaving, setLeaving] = useState(false)
   const [canDelete, setCanDelete] = useState(false)
   const [error, setError] = useState('')
   const [mounted, setMounted] = useState(false)
@@ -658,6 +659,66 @@ export default function GroupDetailPage() {
     }
   }
 
+  const handleLeaveGroup = async () => {
+    if (!currentUser || !group || leaving || deleting) return
+
+    if (group.created_by_auth && currentUser.auth_id === group.created_by_auth) {
+      setError('Eres el creador del grupo. Para salir, elimina el grupo o transfiere la administración primero.')
+      return
+    }
+
+    const confirmed = window.confirm('¿Seguro que quieres salir de este grupo?')
+    if (!confirmed) return
+
+    try {
+      setLeaving(true)
+
+      const { error: leaveRpcError } = await supabase.rpc('leave_group_atomic', {
+        p_group_id: groupId,
+      })
+
+      // Fallback for environments where leave_group_atomic is not installed yet.
+      if (leaveRpcError) {
+        const maybeMissingFunction = leaveRpcError.message?.toLowerCase().includes('leave_group_atomic')
+        if (!maybeMissingFunction) throw leaveRpcError
+
+        const nextMembers = (group.members || []).filter((memberId) => memberId !== currentUser.id)
+
+        const { error: deleteMembershipError } = await supabase
+          .from('group_members')
+          .delete()
+          .eq('group_id', groupId)
+          .eq('user_id', currentUser.id)
+
+        if (deleteMembershipError) throw deleteMembershipError
+
+        const { error: clearUserGroupError } = await supabase
+          .from('users')
+          .update({ group_id: null })
+          .eq('id', currentUser.id)
+
+        if (clearUserGroupError) throw clearUserGroupError
+
+        const { error: syncGroupError } = await supabase
+          .from('groups')
+          .update({
+            members: nextMembers,
+            member_count: Math.max((group.member_count || 1) - 1, 0),
+          })
+          .eq('id', groupId)
+
+        if (syncGroupError) throw syncGroupError
+      }
+
+      router.push('/explore')
+      router.refresh()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo salir del grupo')
+    } finally {
+      setLeaving(false)
+    }
+  }
+
   if (!mounted || loading) {
     return <LoadingScreen title="Abriendo grupo" subtitle="Recuperando detalles y estado actual..." />
   }
@@ -689,15 +750,31 @@ export default function GroupDetailPage() {
             </div>
           </div>
           <div className="w-full md:w-auto md:justify-end">
-            {canDelete && (
-              <button
-                onClick={handleDeleteGroup}
-                disabled={deleting}
-                className="px-4 py-2 rounded-xl border border-rose-200 text-rose-700 font-semibold hover:bg-rose-50 disabled:opacity-50 w-full sm:w-auto"
+            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              <Link
+                href="/explore"
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 text-center w-full sm:w-auto"
               >
-                {deleting ? 'Eliminando...' : 'Eliminar grupo'}
-              </button>
-            )}
+                Cambiar grupo
+              </Link>
+              {canDelete ? (
+                <button
+                  onClick={handleDeleteGroup}
+                  disabled={deleting || leaving}
+                  className="px-4 py-2 rounded-xl border border-rose-200 text-rose-700 font-semibold hover:bg-rose-50 disabled:opacity-50 w-full sm:w-auto"
+                >
+                  {deleting ? 'Eliminando...' : 'Eliminar grupo'}
+                </button>
+              ) : (
+                <button
+                  onClick={handleLeaveGroup}
+                  disabled={leaving || deleting}
+                  className="px-4 py-2 rounded-xl border border-amber-200 text-amber-700 font-semibold hover:bg-amber-50 disabled:opacity-50 w-full sm:w-auto"
+                >
+                  {leaving ? 'Saliendo...' : 'Salir del grupo'}
+                </button>
+              )}
+            </div>
           </div>
         </header>
 

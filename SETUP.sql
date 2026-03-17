@@ -9,6 +9,7 @@ DROP TRIGGER IF EXISTS on_auth_user_created_or_updated ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_auth_user_sync() CASCADE;
 DROP FUNCTION IF EXISTS public.create_group_atomic(TEXT, TEXT, INT, TEXT, INT, INT, INT, TEXT[], TEXT[], TEXT[]) CASCADE;
 DROP FUNCTION IF EXISTS public.join_group_atomic(UUID) CASCADE;
+DROP FUNCTION IF EXISTS public.leave_group_atomic(UUID) CASCADE;
 DROP FUNCTION IF EXISTS public.is_admin_of_group(UUID) CASCADE;
 DROP FUNCTION IF EXISTS public.is_member_of_group(UUID) CASCADE;
 DROP FUNCTION IF EXISTS public.current_user_profile_id() CASCADE;
@@ -392,6 +393,72 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.join_group_atomic(UUID) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.leave_group_atomic(p_group_id UUID)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_user_id UUID;
+  v_group groups%ROWTYPE;
+BEGIN
+  v_user_id := public.current_user_profile_id();
+
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Perfil de usuario no encontrado para auth.uid()=%', auth.uid();
+  END IF;
+
+  SELECT *
+  INTO v_group
+  FROM public.groups
+  WHERE id = p_group_id
+  FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Grupo no encontrado';
+  END IF;
+
+  IF v_group.created_by_auth = auth.uid() THEN
+    RAISE EXCEPTION 'El creador del grupo no puede salir sin eliminar o transferir administracion';
+  END IF;
+
+  DELETE FROM public.group_members
+  WHERE user_id = v_user_id
+    AND group_id = p_group_id;
+
+  UPDATE public.users
+  SET group_id = NULL
+  WHERE id = v_user_id
+    AND group_id = p_group_id;
+
+  UPDATE public.groups g
+  SET
+    member_count = (
+      SELECT COUNT(*)::INT
+      FROM public.group_members gm
+      WHERE gm.group_id = p_group_id
+    ),
+    members = (
+      SELECT COALESCE(ARRAY_AGG(gm.user_id::TEXT ORDER BY gm.joined_at), ARRAY[]::TEXT[])
+      FROM public.group_members gm
+      WHERE gm.group_id = p_group_id
+    ),
+    timezone_coverage = (
+      SELECT COALESCE(ARRAY_AGG(DISTINCT COALESCE(u.timezone, 'Europe/Madrid')), ARRAY[]::TEXT[])
+      FROM public.group_members gm
+      JOIN public.users u ON u.id = gm.user_id
+      WHERE gm.group_id = p_group_id
+    ),
+    updated_at = CURRENT_TIMESTAMP
+  WHERE g.id = p_group_id;
+
+  RETURN p_group_id;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.leave_group_atomic(UUID) TO authenticated;
 
 DROP TRIGGER IF EXISTS on_auth_user_created_or_updated ON auth.users;
 
