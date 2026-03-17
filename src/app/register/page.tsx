@@ -127,7 +127,7 @@ export default function RegisterPage() {
           }
         }
 
-        const { error: dbError } = await supabase.from('users').insert([
+        const { error: dbError } = await supabase.from('users').upsert([
           {
             auth_id: authData.user.id,
             name: formData.name,
@@ -141,7 +141,7 @@ export default function RegisterPage() {
             availability_end: formData.availability_end,
             activities: formData.activities,
           },
-        ])
+        ], { onConflict: 'auth_id' })
 
         if (dbError) throw dbError
 
