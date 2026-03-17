@@ -13,7 +13,6 @@ export default function RegisterPage() {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [retryAfterSeconds, setRetryAfterSeconds] = useState(0)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
     name: '',
@@ -33,16 +32,6 @@ export default function RegisterPage() {
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  useEffect(() => {
-    if (retryAfterSeconds <= 0) return
-
-    const timer = setInterval(() => {
-      setRetryAfterSeconds((prev) => Math.max(prev - 1, 0))
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [retryAfterSeconds])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -66,11 +55,6 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-
-    if (retryAfterSeconds > 0) {
-      setError(`Espera ${retryAfterSeconds}s antes de intentar de nuevo.`)
-      return
-    }
 
     setLoading(true)
 
@@ -127,19 +111,19 @@ export default function RegisterPage() {
       if (authData.user) {
         let activeSession = authData.session
 
-        // Some Supabase projects return no session on signUp depending on confirmation settings.
-        // Try to sign in immediately so the flow works whether confirmation is on or off.
+        // Ensure the user is logged in after signup when email confirmation is disabled.
         if (!activeSession) {
-          const { data: signInData } = await supabase.auth.signInWithPassword({
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
             email: formData.email,
             password: formData.password,
           })
 
+          if (signInError) throw signInError
+
           activeSession = signInData.session
 
           if (!activeSession) {
-            router.push(`/register/check-email?email=${encodeURIComponent(formData.email)}`)
-            return
+            throw new Error('No se pudo iniciar sesion automaticamente despues del registro.')
           }
         }
 
@@ -161,18 +145,10 @@ export default function RegisterPage() {
 
         if (dbError) throw dbError
 
-        await supabase.auth.signOut()
-        router.push('/login?registered=1')
+        router.push('/dashboard')
       }
     } catch (err) {
-      const typedError = err as { message?: string; code?: string; status?: number }
-
-      if (typedError?.status === 429 || typedError?.code === 'over_email_send_rate_limit') {
-        setRetryAfterSeconds(60)
-        setError('Has alcanzado el límite temporal de correos de verificación. Espera 60 s y vuelve a intentarlo.')
-      } else {
-        setError(err instanceof Error ? err.message : 'Error al registrarse')
-      }
+      setError(err instanceof Error ? err.message : 'Error al registrarse')
     } finally {
       setLoading(false)
     }
@@ -204,7 +180,7 @@ export default function RegisterPage() {
               2. Registramos tu cuenta
             </div>
             <div className="rounded-xl border p-3 text-sm border-slate-200 bg-white text-slate-600">
-              3. Te indicamos cómo continuar
+              3. Entras automaticamente al dashboard
             </div>
           </div>
         </div>
