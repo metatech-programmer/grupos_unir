@@ -112,7 +112,7 @@ export default function GlobalNav() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
+    <nav className="app-nav-shell sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
           <span className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center">
@@ -121,7 +121,7 @@ export default function GlobalNav() {
           <span className="text-slate-900 font-bold hidden sm:inline" style={{ fontFamily: 'var(--font-sora)' }}>GrupoFlow</span>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-1.5 p-1 rounded-2xl border border-slate-200 bg-slate-100/80 shadow-sm">
+        <div className="app-nav-dock hidden lg:flex items-center gap-1.5 p-1 rounded-2xl border border-slate-200 bg-slate-100/80 shadow-sm">
           {links.map((link) => (
             <div key={link.href} className="relative group">
               <Link href={link.href} className={desktopLinkClass(link.href)} aria-label={link.label}>
@@ -184,7 +184,7 @@ export default function GlobalNav() {
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-3">
+        <div className="app-nav-mobile md:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-3">
           <div className="grid grid-cols-2 gap-2">
             {links.map((link) => (
               <Link
