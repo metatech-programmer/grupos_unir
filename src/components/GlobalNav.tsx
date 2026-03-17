@@ -81,7 +81,7 @@ export default function GlobalNav() {
       { href: '/dashboard', label: 'Dashboard', icon: GridIcon },
       { href: '/create-group', label: 'Crear grupo', icon: PlusIcon },
       { href: '/settings', label: 'Ajustes', icon: SettingsIcon },
-      { href: '/register', label: 'Perfil', icon: UserIcon },
+      { href: '/profile', label: 'Perfil', icon: UserIcon },
     ]
 
     if (profile?.group_id) {

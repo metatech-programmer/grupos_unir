@@ -123,7 +123,7 @@ export default function DashboardPage() {
             <p><strong>Horario:</strong> {String(user.availability_start).padStart(2, '0')}:00 - {String(user.availability_end).padStart(2, '0')}:00</p>
             <p><strong>Actividades:</strong> {(user.activities || []).join(', ')}</p>
           </div>
-          <Link href="/register" className="btn-outline mt-5 inline-flex">Actualizar perfil</Link>
+          <Link href="/profile" className="btn-outline mt-5 inline-flex">Actualizar perfil</Link>
         </section>
 
         <section className="card lg:col-span-2">
