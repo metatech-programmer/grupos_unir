@@ -38,6 +38,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const motivationalPhrases = [
+    'Juntos somos más fuertes',
+    'Colaboración sin límites',
+    'Sinergia en equipo',
+    'Trabajo conjunto, éxito común',
+    'Unidos hacia el objetivo',
+    'Diversidad que suma',
+    'Talento compartido',
+    'Creatividad colaborativa',
+  ]
+
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${sora.variable} ${manrope.variable} bg-gray-50`} style={{ fontFamily: 'var(--font-manrope)' }}>
@@ -46,6 +57,20 @@ export default function RootLayout({
           <span className="ambient-shape ambient-shape-2" />
           <span className="ambient-shape ambient-shape-3" />
           <span className="ambient-grid" />
+          <div className="ambient-scroll">
+            <div className="ambient-scroll-inner">
+              {motivationalPhrases.map((phrase, idx) => (
+                <span key={`phrase-${idx}`} className="ambient-scroll-item">
+                  {phrase}
+                </span>
+              ))}
+              {motivationalPhrases.map((phrase, idx) => (
+                <span key={`phrase-repeat-${idx}`} className="ambient-scroll-item">
+                  {phrase}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
         <PWARegistration />
         <GlobalNav />
