@@ -41,9 +41,15 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${sora.variable} ${manrope.variable} bg-gray-50`} style={{ fontFamily: 'var(--font-manrope)' }}>
+        <div className="ambient-bg" aria-hidden="true">
+          <span className="ambient-shape ambient-shape-1" />
+          <span className="ambient-shape ambient-shape-2" />
+          <span className="ambient-shape ambient-shape-3" />
+          <span className="ambient-grid" />
+        </div>
         <PWARegistration />
         <GlobalNav />
-        <main>{children}</main>
+        <main className="page-enter">{children}</main>
       </body>
     </html>
   )

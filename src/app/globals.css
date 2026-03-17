@@ -99,6 +99,103 @@ body {
   }
 }
 
+@keyframes drift-float {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(26px, -20px, 0) scale(1.06);
+  }
+  66% {
+    transform: translate3d(-14px, 22px, 0) scale(0.98);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes ambient-sway {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(4deg) scale(1.04);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes content-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.ambient-shape {
+  position: absolute;
+  display: block;
+  border-radius: 9999px;
+  filter: blur(2px);
+  opacity: 0.72;
+}
+
+.ambient-shape-1 {
+  width: min(44vw, 560px);
+  height: min(44vw, 560px);
+  top: -14%;
+  left: -10%;
+  background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.32), rgba(59, 130, 246, 0));
+  animation: drift-float 18s ease-in-out infinite;
+}
+
+.ambient-shape-2 {
+  width: min(38vw, 460px);
+  height: min(38vw, 460px);
+  top: 10%;
+  right: -8%;
+  background: radial-gradient(circle at 60% 35%, rgba(56, 189, 248, 0.26), rgba(56, 189, 248, 0));
+  animation: drift-float 20s ease-in-out infinite reverse;
+}
+
+.ambient-shape-3 {
+  width: min(32vw, 420px);
+  height: min(32vw, 420px);
+  bottom: -12%;
+  left: 28%;
+  background: radial-gradient(circle at 45% 55%, rgba(21, 183, 158, 0.2), rgba(21, 183, 158, 0));
+  animation: ambient-sway 24s ease-in-out infinite;
+}
+
+.ambient-grid {
+  position: absolute;
+  inset: -8%;
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(circle at 50% 30%, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.08) 70%);
+  animation: ambient-sway 26s ease-in-out infinite;
+  opacity: 0.55;
+}
+
+.page-enter {
+  animation: content-fade-up 320ms ease-out both;
+}
+
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center px-4 sm:px-5 py-2.5 rounded-xl text-white font-semibold text-center leading-tight transition-all duration-200;
@@ -197,6 +294,12 @@ body {
   .modal-panel-enter {
     animation: none !important;
   }
+
+  .ambient-shape,
+  .ambient-grid,
+  .page-enter {
+    animation: none !important;
+  }
 }
 
 html[data-theme='dark'] .card {
@@ -238,6 +341,25 @@ html[data-theme='dark'] .hero-grid {
   background-image:
     linear-gradient(to right, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+}
+
+html[data-theme='dark'] .ambient-shape-1 {
+  background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.34), rgba(59, 130, 246, 0));
+}
+
+html[data-theme='dark'] .ambient-shape-2 {
+  background: radial-gradient(circle at 60% 35%, rgba(14, 165, 233, 0.3), rgba(14, 165, 233, 0));
+}
+
+html[data-theme='dark'] .ambient-shape-3 {
+  background: radial-gradient(circle at 45% 55%, rgba(20, 184, 166, 0.24), rgba(20, 184, 166, 0));
+}
+
+html[data-theme='dark'] .ambient-grid {
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.1) 1px, transparent 1px);
+  opacity: 0.5;
 }
 
 html[data-theme='dark'] .bg-white,
