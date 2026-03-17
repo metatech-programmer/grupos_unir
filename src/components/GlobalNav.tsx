@@ -140,7 +140,7 @@ export default function GlobalNav() {
           <span className="text-slate-900 font-bold hidden sm:inline" style={{ fontFamily: 'var(--font-sora)' }}>GrupoFlow</span>
         </Link>
 
-        <div className="app-nav-dock hidden lg:flex items-center gap-1.5 p-1 rounded-2xl border border-slate-200 bg-slate-100/80 shadow-sm">
+        <div className="app-nav-dock hidden lg:flex items-center gap-1.5 p-1 rounded-2xl border border-slate-400 bg-slate-500/80 shadow-sm">
           {links.map((link) => (
             <div key={link.href} className="relative group">
               <Link href={link.href} className={desktopLinkClass(link.href)} aria-label={link.label}>
