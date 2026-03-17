@@ -312,8 +312,8 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <button type="submit" disabled={loading || retryAfterSeconds > 0} className="w-full btn-primary disabled:opacity-50">
-            {loading ? 'Creando cuenta...' : retryAfterSeconds > 0 ? `Reintentar en ${retryAfterSeconds}s` : 'Crear Cuenta'}
+          <button type="submit" disabled={loading} className="w-full btn-primary disabled:opacity-50">
+            {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
           </button>
         </form>
 
