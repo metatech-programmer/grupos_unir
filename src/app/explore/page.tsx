@@ -12,6 +12,7 @@ import LoadingScreen from '@/components/LoadingScreen'
 export default function ExplorePage() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
+  const [isChangeMode, setIsChangeMode] = useState(false)
   const [suggestions, setSuggestions] = useState<GroupSuggestion[]>([])
   const [allGroups, setAllGroups] = useState<Group[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,6 +52,8 @@ export default function ExplorePage() {
 
   useEffect(() => {
     setMounted(true)
+    const params = new URLSearchParams(window.location.search)
+    setIsChangeMode(params.get('change') === '1')
   }, [])
 
   useEffect(() => {
@@ -161,6 +164,11 @@ export default function ExplorePage() {
       return
     }
 
+    if (user.group_id && !isChangeMode) {
+      setError('Ya perteneces a un grupo. Para unirte a otro, usa la opción "Cambiar grupo" o sal del grupo actual.')
+      return
+    }
+
     try {
       const targetGroup = allGroups.find(g => g.id === groupId)
       if (!targetGroup) throw new Error('Grupo no encontrado')
@@ -187,6 +195,9 @@ export default function ExplorePage() {
     return suggestions.filter(s => s.group.subject === filterSubject)
   }, [filterSubject, suggestions])
 
+  const hasActiveGroup = Boolean(user?.group_id)
+  const canJoinGroups = !hasActiveGroup || isChangeMode
+
   if (!mounted || loading) {
     return <LoadingScreen title="Buscando grupos" subtitle="Calculando recomendaciones y compatibilidad..." />
   }
@@ -207,6 +218,16 @@ export default function ExplorePage() {
         </header>
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+
+        {hasActiveGroup && !isChangeMode && (
+          <div className="card mb-6 border border-amber-200 bg-amber-50/70">
+            <p className="text-amber-900 font-semibold">Ya perteneces a un grupo.</p>
+            <p className="text-amber-800 text-sm mt-1">No puedes unirte a otro grupo desde aquí hasta salir del actual o entrar en modo cambio.</p>
+            <div className="mt-3">
+              <Link href={`/groups/${user?.group_id}`} className="btn-outline">Ir a mi grupo actual</Link>
+            </div>
+          </div>
+        )}
 
         <div className="card mb-6">
           <label className="block text-sm font-semibold text-gray-700 mb-2">Filtrar por asignatura</label>
@@ -268,7 +289,11 @@ export default function ExplorePage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:justify-items-start">
-                  <button onClick={() => handleJoinGroup(suggestion.group.id)} className="btn-primary w-full sm:w-auto">{user ? 'Unirme a este grupo' : 'Inicia sesión para unirte'}</button>
+                  {canJoinGroups ? (
+                    <button onClick={() => handleJoinGroup(suggestion.group.id)} className="btn-primary w-full sm:w-auto">{user ? (isChangeMode ? 'Cambiarme a este grupo' : 'Unirme a este grupo') : 'Inicia sesión para unirte'}</button>
+                  ) : (
+                    <Link href={`/groups/${user?.group_id}`} className="btn-outline w-full sm:w-auto text-center">Ver mi grupo actual</Link>
+                  )}
                   <Link href={`/groups/${suggestion.group.id}`} className="btn-outline w-full sm:w-auto">Ver detalle</Link>
                 </div>
               </article>

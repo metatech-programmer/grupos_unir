@@ -814,7 +814,7 @@ export default function GroupDetailPage() {
                 ) : (
                   <>
                     <Link
-                      href="/explore"
+                      href="/explore?change=1"
                       className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 text-center w-full sm:w-auto"
                     >
                       Cambiar grupo
