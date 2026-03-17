@@ -177,6 +177,61 @@ body {
   overflow: hidden;
 }
 
+.ambient-svg {
+  position: absolute;
+  display: block;
+  mix-blend-mode: screen;
+}
+
+.ambient-svg-1 {
+  width: 320px;
+  height: 300px;
+  top: 8%;
+  left: 5%;
+  animation: blob-float 15s ease-in-out infinite;
+}
+
+.ambient-svg-2 {
+  width: 280px;
+  height: 270px;
+  top: 20%;
+  right: 12%;
+  animation: blob-float 18s ease-in-out infinite reverse;
+}
+
+.ambient-svg-3 {
+  width: 320px;
+  height: 200px;
+  bottom: 8%;
+  left: 8%;
+  animation: wave-undulate 10s ease-in-out infinite;
+}
+
+.ambient-svg-4 {
+  width: 300px;
+  height: 280px;
+  bottom: 5%;
+  right: 5%;
+  animation: blob-float 22s ease-in-out infinite reverse;
+}
+
+.ambient-svg-5 {
+  width: 200px;
+  height: 200px;
+  top: 45%;
+  right: 8%;
+  animation: circle-pulse 8s ease-in-out infinite;
+}
+
+.ambient-svg-6 {
+  width: 400px;
+  height: 120px;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: wave-undulate 12s ease-in-out infinite;
+}
+
 .ambient-shape {
   position: absolute;
   display: none;
@@ -398,6 +453,7 @@ body {
 
   .ambient-shape,
   .ambient-grid,
+  .ambient-svg,
   .page-enter {
     animation: none !important;
   }
@@ -444,30 +500,8 @@ html[data-theme='dark'] .hero-grid {
     linear-gradient(to bottom, rgba(148, 163, 184, 0.14) 1px, transparent 1px);
 }
 
-html[data-theme='dark'] .ambient-blob-1 {
-  background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.14), transparent 60%);
-}
-
-html[data-theme='dark'] .ambient-blob-2 {
-  background: radial-gradient(circle at 60% 40%, rgba(30, 144, 255, 0.12), transparent 60%);
-}
-
-html[data-theme='dark'] .ambient-blob-3 {
-  background: radial-gradient(circle at 45% 55%, rgba(20, 184, 166, 0.1), transparent 60%);
-}
-
-html[data-theme='dark'] .ambient-blob-4 {
-  background: radial-gradient(circle at 35% 55%, rgba(37, 99, 235, 0.11), transparent 65%);
-}
-
-html[data-theme='dark'] .ambient-circle-1 {
-  border-color: rgba(59, 130, 246, 0.18);
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
-}
-
-html[data-theme='dark'] .ambient-circle-2 {
-  border-color: rgba(30, 144, 255, 0.16);
-  background: radial-gradient(circle, rgba(30, 144, 255, 0.07) 0%, transparent 70%);
+html[data-theme='dark'] .ambient-svg {
+  mix-blend-mode: overlay;
 }
 
 html[data-theme='dark'] .bg-white,
