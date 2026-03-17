@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase, Group, User, GroupMessage } from '@/lib/supabase'
-import { TeamIcon, ClockIcon } from '@/components/icons'
+import { TeamIcon, ClockIcon, EditIcon, TrashIcon, CheckIcon, CloseIcon } from '@/components/icons'
 import LoadingScreen from '@/components/LoadingScreen'
 
 type MessageWithAuthor = GroupMessage & {
@@ -28,6 +28,12 @@ type MessageBroadcastPayload = {
 type DeleteBroadcastPayload = {
   id: string
   group_id: string
+}
+
+type EditBroadcastPayload = {
+  id: string
+  group_id: string
+  message: string
 }
 
 const isTemporaryMessageId = (messageId: string) => messageId.startsWith('temp-')
@@ -76,6 +82,10 @@ export default function GroupDetailPage() {
   const [newMessage, setNewMessage] = useState('')
   const [sending, setSending] = useState(false)
   const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null)
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null)
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
+  const [editingMessageText, setEditingMessageText] = useState('')
+  const [savingEditMessageId, setSavingEditMessageId] = useState<string | null>(null)
   const [updatingRoleUserId, setUpdatingRoleUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
@@ -341,6 +351,18 @@ export default function GroupDetailPage() {
         if (!incoming?.id || incoming.group_id !== groupId) return
 
         setMessages((prev) => prev.filter((message) => message.id !== incoming.id))
+        setSelectedMessageId((prev) => (prev === incoming.id ? null : prev))
+        setEditingMessageId((prev) => (prev === incoming.id ? null : prev))
+      })
+      .on('broadcast', { event: 'message_edited' }, ({ payload }) => {
+        const incoming = payload as EditBroadcastPayload
+        if (!incoming?.id || incoming.group_id !== groupId) return
+
+        setMessages((prev) => prev.map((message) => (
+          message.id === incoming.id
+            ? { ...message, message: incoming.message }
+            : message
+        )))
       })
       .on('presence', { event: 'sync' }, () => {
         syncTypingUsers(channel)
@@ -505,6 +527,77 @@ export default function GroupDetailPage() {
       setError(err instanceof Error ? err.message : 'No se pudo eliminar el mensaje')
     } finally {
       setDeletingMessageId(null)
+    }
+  }
+
+  const startEditingMessage = (messageId: string) => {
+    const targetMessage = messages.find((message) => message.id === messageId)
+    if (!targetMessage || isTemporaryMessageId(messageId)) return
+    if (!currentUser || targetMessage.user_id !== currentUser.id) return
+
+    setEditingMessageId(messageId)
+    setEditingMessageText(targetMessage.message)
+  }
+
+  const cancelEditingMessage = () => {
+    setEditingMessageId(null)
+    setEditingMessageText('')
+  }
+
+  const handleSaveEditedMessage = async () => {
+    if (!editingMessageId || !currentUser || savingEditMessageId) return
+
+    const nextText = editingMessageText.trim()
+    if (!nextText) {
+      setError('El mensaje no puede quedar vacío')
+      return
+    }
+
+    const originalMessage = messages.find((message) => message.id === editingMessageId)
+    if (!originalMessage || originalMessage.user_id !== currentUser.id) return
+    if (originalMessage.message === nextText) {
+      cancelEditingMessage()
+      return
+    }
+
+    const previousMessages = messages
+    setSavingEditMessageId(editingMessageId)
+    setMessages((prev) => prev.map((message) => (
+      message.id === editingMessageId
+        ? { ...message, message: nextText }
+        : message
+    )))
+
+    try {
+      const messageId = editingMessageId
+      const { error: updateError } = await supabase
+        .from('group_messages')
+        .update({ message: nextText })
+        .eq('id', messageId)
+        .eq('user_id', currentUser.id)
+
+      if (updateError) throw updateError
+
+      if (chatChannelRef.current) {
+        await chatChannelRef.current.send({
+          type: 'broadcast',
+          event: 'message_edited',
+          payload: {
+            id: messageId,
+            group_id: groupId,
+            message: nextText,
+          } satisfies EditBroadcastPayload,
+        })
+      }
+
+      setEditingMessageId(null)
+      setEditingMessageText('')
+      setSelectedMessageId(null)
+    } catch (err) {
+      setMessages(previousMessages)
+      setError(err instanceof Error ? err.message : 'No se pudo editar el mensaje')
+    } finally {
+      setSavingEditMessageId(null)
     }
   }
 
@@ -751,6 +844,8 @@ export default function GroupDetailPage() {
                   messages.map((message) => {
                     const isOwnMessage = Boolean(currentUser && message.user_id === currentUser.id)
                     const authorName = message.users?.name || 'Miembro'
+                    const showOwnActions = isOwnMessage && selectedMessageId === message.id && !isTemporaryMessageId(message.id)
+                    const isEditing = editingMessageId === message.id
 
                     return (
                       <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
@@ -765,18 +860,89 @@ export default function GroupDetailPage() {
                             <span>{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
 
-                          <div className={`rounded-2xl px-3 py-2 shadow-sm border ${isOwnMessage ? 'bg-blue-600 text-white border-blue-500 rounded-br-md' : 'bg-white text-slate-800 border-slate-200 rounded-bl-md'}`}>
-                            <p className="text-sm whitespace-pre-wrap break-words">{message.message}</p>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!isOwnMessage || isTemporaryMessageId(message.id)) return
+                              if (editingMessageId && editingMessageId !== message.id) return
+                              setSelectedMessageId((prev) => (prev === message.id ? null : message.id))
+                            }}
+                            className={`text-left rounded-2xl px-3 py-2 shadow-sm border transition ${isOwnMessage ? 'bg-blue-600 text-white border-blue-500 rounded-br-md' : 'bg-white text-slate-800 border-slate-200 rounded-bl-md'} ${isOwnMessage && !isTemporaryMessageId(message.id) ? 'cursor-pointer' : 'cursor-default'} ${showOwnActions ? 'ring-2 ring-blue-200' : ''}`}
+                          >
+                            {isEditing ? (
+                              <input
+                                value={editingMessageText}
+                                onChange={(e) => setEditingMessageText(e.target.value)}
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    handleSaveEditedMessage()
+                                  }
 
-                          {isOwnMessage && !isTemporaryMessageId(message.id) && (
-                            <button
-                              onClick={() => handleDeleteMessage(message.id)}
-                              disabled={deletingMessageId === message.id}
-                              className="text-xs px-2 py-0.5 rounded-full border border-rose-200 text-rose-700 bg-rose-50 hover:bg-rose-100 disabled:opacity-50"
-                            >
-                              {deletingMessageId === message.id ? 'Eliminando...' : 'Eliminar'}
-                            </button>
+                                  if (e.key === 'Escape') {
+                                    e.preventDefault()
+                                    cancelEditingMessage()
+                                  }
+                                }}
+                                className="w-full min-w-[200px] text-sm rounded-lg border border-white/50 bg-white/95 text-slate-900 px-2 py-1"
+                                placeholder="Editar mensaje"
+                                autoFocus
+                              />
+                            ) : (
+                              <p className="text-sm whitespace-pre-wrap break-words">{message.message}</p>
+                            )}
+                          </button>
+
+                          {showOwnActions && (
+                            <div className="flex items-center gap-2">
+                              {isEditing ? (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={handleSaveEditedMessage}
+                                    disabled={savingEditMessageId === message.id}
+                                    className="h-7 w-7 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 flex items-center justify-center disabled:opacity-50"
+                                    title="Guardar edición"
+                                    aria-label="Guardar edición"
+                                  >
+                                    <CheckIcon className="h-4 w-4" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={cancelEditingMessage}
+                                    disabled={savingEditMessageId === message.id}
+                                    className="h-7 w-7 rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 flex items-center justify-center disabled:opacity-50"
+                                    title="Cancelar edición"
+                                    aria-label="Cancelar edición"
+                                  >
+                                    <CloseIcon className="h-4 w-4" />
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => startEditingMessage(message.id)}
+                                    className="h-7 w-7 rounded-full border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 flex items-center justify-center"
+                                    title="Editar mensaje"
+                                    aria-label="Editar mensaje"
+                                  >
+                                    <EditIcon className="h-4 w-4" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteMessage(message.id)}
+                                    disabled={deletingMessageId === message.id}
+                                    className="h-7 w-7 rounded-full border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 flex items-center justify-center disabled:opacity-50"
+                                    title="Eliminar mensaje"
+                                    aria-label="Eliminar mensaje"
+                                  >
+                                    <TrashIcon className="h-4 w-4" />
+                                  </button>
+                                </>
+                              )}
+                            </div>
                           )}
                         </div>
                       </div>
