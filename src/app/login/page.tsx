@@ -37,7 +37,16 @@ export default function LoginPage() {
       if (authError) throw authError
       router.push('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al iniciar sesión')
+      const typedError = err as { message?: string; code?: string }
+      const isEmailNotConfirmed =
+        typedError?.code === 'email_not_confirmed' ||
+        /email\s+not\s+confirmed/i.test(typedError?.message || '')
+
+      if (isEmailNotConfirmed) {
+        setError('Tu proyecto aun exige verificacion por correo. Desactiva Confirm email en Supabase Authentication > Providers > Email.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Error al iniciar sesión')
+      }
     } finally {
       setLoading(false)
     }

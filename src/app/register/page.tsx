@@ -148,7 +148,16 @@ export default function RegisterPage() {
         router.push('/dashboard')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al registrarse')
+      const typedError = err as { message?: string; code?: string }
+      const isEmailNotConfirmed =
+        typedError?.code === 'email_not_confirmed' ||
+        /email\s+not\s+confirmed/i.test(typedError?.message || '')
+
+      if (isEmailNotConfirmed) {
+        setError('El proyecto de Supabase aun tiene activa la verificacion de correo. Desactiva Confirm email en Authentication > Providers > Email.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Error al registrarse')
+      }
     } finally {
       setLoading(false)
     }
