@@ -18,7 +18,7 @@ html[data-theme='dark'] {
   --bg-soft: #0a1224;
   --ink-strong: #e6edf7;
   --ink-muted: #9aacbf;
-  --line: #27344a;
+  --line: #2b4261;
   --brand-900: #0f172a;
   --brand-700: #1d4ed8;
   --brand-500: #2563eb;
@@ -214,19 +214,19 @@ html[data-theme='dark'] .btn-primary:hover {
 }
 
 html[data-theme='dark'] .btn-outline {
-  background-color: rgba(12, 21, 40, 0.75);
+  background: linear-gradient(180deg, rgba(15, 31, 58, 0.66), rgba(15, 31, 58, 0.48));
   color: #dbeafe;
-  border-color: #334155;
+  border-color: rgba(125, 211, 252, 0.26);
 }
 
 html[data-theme='dark'] .btn-outline:hover {
-  border-color: #475569;
-  background-color: rgba(15, 23, 42, 0.92);
+  border-color: rgba(125, 211, 252, 0.4);
+  background: linear-gradient(180deg, rgba(20, 40, 74, 0.72), rgba(20, 40, 74, 0.56));
 }
 
 html[data-theme='dark'] .input-modern {
-  background-color: rgba(12, 21, 40, 0.78);
-  border-color: #334155;
+  background-color: rgba(14, 31, 58, 0.78);
+  border-color: rgba(125, 211, 252, 0.22);
   color: #e6edf7;
 }
 
@@ -243,15 +243,25 @@ html[data-theme='dark'] .hero-grid {
 html[data-theme='dark'] .bg-white,
 html[data-theme='dark'] .bg-white\/95,
 html[data-theme='dark'] .bg-white\/90 {
-  background-color: rgba(12, 21, 40, 0.92) !important;
+  background-color: rgba(12, 26, 48, 0.9) !important;
 }
 
 html[data-theme='dark'] .bg-slate-50 {
-  background-color: #101b32 !important;
+  background-color: rgba(15, 31, 58, 0.72) !important;
 }
 
 html[data-theme='dark'] .bg-slate-100 {
-  background-color: #1b2a45 !important;
+  background-color: rgba(20, 40, 74, 0.72) !important;
+}
+
+html[data-theme='dark'] .bg-slate-200 {
+  background-color: rgba(35, 59, 99, 0.72) !important;
+}
+
+html[data-theme='dark'] .bg-gray-50,
+html[data-theme='dark'] .bg-gray-100,
+html[data-theme='dark'] .bg-gray-200 {
+  background-color: rgba(16, 34, 64, 0.72) !important;
 }
 
 html[data-theme='dark'] .chat-surface {
@@ -261,11 +271,17 @@ html[data-theme='dark'] .chat-surface {
 
 html[data-theme='dark'] .border-slate-200,
 html[data-theme='dark'] .border-slate-200\/80 {
-  border-color: #334155 !important;
+  border-color: rgba(125, 211, 252, 0.24) !important;
 }
 
 html[data-theme='dark'] .border-slate-300 {
-  border-color: #475569 !important;
+  border-color: rgba(125, 211, 252, 0.32) !important;
+}
+
+html[data-theme='dark'] .border-gray-200,
+html[data-theme='dark'] .border-gray-300,
+html[data-theme='dark'] .border-gray-400 {
+  border-color: rgba(125, 211, 252, 0.24) !important;
 }
 
 html[data-theme='dark'] .text-slate-900,
@@ -276,12 +292,17 @@ html[data-theme='dark'] .text-slate-700 {
 
 html[data-theme='dark'] .text-slate-600,
 html[data-theme='dark'] .text-slate-500 {
-  color: #9aacbf !important;
+  color: #a9bbd1 !important;
 }
 
 html[data-theme='dark'] .text-gray-700,
 html[data-theme='dark'] .text-gray-600 {
-  color: #a9b7cc !important;
+  color: #a9bbd1 !important;
+}
+
+html[data-theme='dark'] .text-gray-500,
+html[data-theme='dark'] .text-slate-400 {
+  color: #8ea7c4 !important;
 }
 
 html[data-theme='dark'] .bg-red-100 {
