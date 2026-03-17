@@ -138,7 +138,7 @@ export default function RegisterPage() {
           activeSession = signInData.session
 
           if (!activeSession) {
-            setError('Tu cuenta fue creada, pero requiere confirmación por correo antes de iniciar sesión.')
+            router.push(`/register/check-email?email=${encodeURIComponent(formData.email)}`)
             return
           }
         }
@@ -160,7 +160,9 @@ export default function RegisterPage() {
         ])
 
         if (dbError) throw dbError
-        router.push('/dashboard')
+
+        await supabase.auth.signOut()
+        router.push('/login?registered=1')
       }
     } catch (err) {
       const typedError = err as { message?: string; code?: string; status?: number }
@@ -185,13 +187,33 @@ export default function RegisterPage() {
       <div className="max-w-4xl mx-auto card">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
           <div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Crear Perfil Operativo</h2>
-            <p className="text-slate-600 mt-2">La distribución inteligente usa horario, carga diaria, trabajo y actividades.</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Crear Cuenta</h2>
+            <p className="text-slate-600 mt-2">Te guiamos paso a paso para registrarte y saber exactamente qué sigue.</p>
           </div>
           <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">
             <SparkIcon className="h-6 w-6" />
           </div>
         </div>
+
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="rounded-xl border p-3 text-sm border-sky-300 bg-sky-50 text-sky-800">
+              1. Completa tus datos
+            </div>
+            <div className={`rounded-xl border p-3 text-sm ${loading ? 'border-sky-300 bg-sky-50 text-sky-800 animate-pulse' : 'border-slate-200 bg-white text-slate-600'}`}>
+              2. Registramos tu cuenta
+            </div>
+            <div className="rounded-xl border p-3 text-sm border-slate-200 bg-white text-slate-600">
+              3. Te indicamos cómo continuar
+            </div>
+          </div>
+        </div>
+
+        {loading && (
+          <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 text-sky-800 px-4 py-3 text-sm">
+            Estamos creando tu cuenta y validando el acceso. No cierres esta pantalla.
+          </div>
+        )}
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -199,7 +221,7 @@ export default function RegisterPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" aria-busy={loading}>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre Completo</label>
