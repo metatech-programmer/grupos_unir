@@ -155,7 +155,7 @@ export default function InstallAppButton({ className, compact = false }: Install
         <button
           type="button"
           onClick={showManualInstructions}
-          className={className || 'btn-outline text-sm'}
+          className={className || 'btn-ghost text-sm'}
           title={hideHelp ? 'Guia oculta. Activala en Ajustes si la necesitas.' : 'Ver guia de instalacion'}
           aria-label="Instalar app"
         >
@@ -227,7 +227,7 @@ export default function InstallAppButton({ className, compact = false }: Install
                 </label>
 
                 <div className="mt-5 flex justify-end gap-2">
-                  <button type="button" className="btn-outline text-sm" onClick={closeHelpModal}>
+                  <button type="button" className="btn-ghost text-sm" onClick={closeHelpModal}>
                     Cerrar
                   </button>
                 </div>
@@ -243,7 +243,7 @@ export default function InstallAppButton({ className, compact = false }: Install
     <button
       type="button"
       onClick={handleInstall}
-      className={className || 'btn-outline text-sm'}
+      className={className || 'btn-ghost text-sm'}
       aria-label="Instalar app"
       title="Instalar app"
     >

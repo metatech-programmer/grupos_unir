@@ -31,7 +31,7 @@ export default function ThemeToggle({ className, compact = false }: ThemeToggleP
     <button
       type="button"
       onClick={toggleMode}
-      className={className || 'btn-outline text-sm'}
+      className={className || 'btn-ghost text-sm'}
       aria-label={label}
       title={label}
     >

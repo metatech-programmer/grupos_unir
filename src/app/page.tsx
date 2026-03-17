@@ -77,9 +77,9 @@ export default function Home() {
               <p className="mt-5 text-slate-600 text-base sm:text-lg max-w-xl">
                 Diseñada para clases internacionales: crea equipos de 3 a 5 personas, compara pros y contras, y decide con información real.
               </p>
-              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
                 <Link href="/explore" className="btn-primary w-full sm:w-auto">Explorar grupos</Link>
-                {!adminGroupId && <Link href="/create-group" className="btn-outline w-full sm:w-auto">Crear grupo</Link>}
+                {!adminGroupId && <Link href="/create-group" className="btn-ghost w-full sm:w-auto">Crear grupo</Link>}
               </div>
             </div>
 

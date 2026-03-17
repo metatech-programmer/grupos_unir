@@ -119,19 +119,19 @@ export default function GlobalNav() {
   const desktopLinkClass = (href: string) => {
     const active = pathname === href || pathname?.startsWith(`${href}/`)
     return active
-      ? 'h-10 px-3 rounded-xl bg-slate-900 text-white text-sm font-semibold inline-flex items-center gap-2'
-      : 'h-10 px-3 rounded-xl text-slate-700 hover:bg-slate-100 text-sm font-semibold inline-flex items-center gap-2'
+      ? 'h-10 px-3 rounded-xl bg-slate-800/60 text-white text-sm font-semibold inline-flex items-center gap-2'
+      : 'h-10 px-3 rounded-xl text-slate-200 hover:bg-slate-800/40 text-sm font-semibold inline-flex items-center gap-2'
   }
 
   const mobileLinkClass = (href: string) => {
     const active = pathname === href || pathname?.startsWith(`${href}/`)
     return active
-      ? 'px-3 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold'
-      : 'px-3 py-2 rounded-lg bg-slate-50 text-slate-700 text-sm font-semibold'
+      ? 'px-3 py-2 rounded-lg bg-slate-800/60 text-white text-sm font-semibold'
+      : 'px-3 py-2 rounded-lg bg-slate-900/20 text-slate-200 text-sm font-semibold'
   }
 
   return (
-    <nav className="app-nav-shell sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
+    <nav className="app-nav-shell sticky top-0 z-50 border-b border-slate-800/30 bg-slate-900/60 text-slate-50 backdrop-blur-sm md:backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
           <span className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center">
@@ -158,21 +158,21 @@ export default function GlobalNav() {
           {authId ? (
             <>
               <div className="relative group">
-                <ThemeToggle compact className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-700 inline-flex items-center justify-center" />
+                <ThemeToggle compact className="h-10 w-10 rounded-xl border border-slate-700 bg-transparent text-slate-100 inline-flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400" />
                 <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">Tema</span>
               </div>
               <div className="relative group">
-                <InstallAppButton compact className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-700 inline-flex items-center justify-center" />
+                <InstallAppButton compact className="h-10 w-10 rounded-xl border border-slate-700 bg-transparent text-slate-100 inline-flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400" />
                 <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">Instalar</span>
               </div>
               <div className="relative group">
-                <PushNotificationsToggle compact className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-700 inline-flex items-center justify-center" />
+                <PushNotificationsToggle compact className="h-10 w-10 rounded-xl border border-slate-700 bg-transparent text-slate-100 inline-flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400" />
                 <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">Notificaciones</span>
               </div>
               <div className="relative group">
                 <button
                   onClick={handleLogout}
-                  className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-700 inline-flex items-center justify-center"
+                  className="h-10 w-10 rounded-xl border border-slate-700 bg-transparent text-slate-100 inline-flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                   title="Cerrar sesión"
                   aria-label="Cerrar sesión"
                 >
@@ -195,7 +195,7 @@ export default function GlobalNav() {
         <button
           type="button"
           onClick={() => setMobileOpen((prev) => !prev)}
-          className="md:hidden h-10 w-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center"
+          className="md:hidden h-10 w-10 rounded-lg border border-slate-700 bg-transparent text-slate-100 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
           aria-label="Abrir menú"
         >
           {mobileOpen ? <CloseIcon className="h-4 w-4" /> : <MenuIcon className="h-4 w-4" />}
@@ -203,7 +203,7 @@ export default function GlobalNav() {
       </div>
 
       {mobileOpen && (
-        <div className="app-nav-mobile md:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-3">
+        <div className="app-nav-mobile md:hidden border-t border-slate-800/30 bg-slate-900/80 px-4 py-3 space-y-3 text-slate-100">
           <div className="grid grid-cols-2 gap-2">
             {links.map((link) => (
               <Link

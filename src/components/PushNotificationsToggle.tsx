@@ -169,7 +169,7 @@ export default function PushNotificationsToggle({ className, compact = false }: 
   }
 
   const label = loading ? 'Procesando...' : enabled ? 'Notificaciones activas' : 'Activar notificaciones'
-  const baseClass = className || 'btn-outline text-sm'
+  const baseClass = className || 'btn-ghost text-sm'
 
   return (
     <>

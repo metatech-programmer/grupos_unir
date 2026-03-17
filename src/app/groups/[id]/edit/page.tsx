@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { SUBJECTS } from '@/lib/subjects'
 import { ACTIVITIES, DAILY_HOURS, WORK_STATUS, SCHEDULE_SLOTS } from '@/lib/profile-options'
 import LoadingScreen from '@/components/LoadingScreen'
+import { Button, Input, Card } from '@/components/ui'
 
 type GroupForm = {
   name: string
@@ -197,7 +198,8 @@ export default function EditGroupPage() {
 
   return (
     <div className="min-h-screen px-4 py-8 md:py-10">
-      <div className="max-w-3xl mx-auto card">
+      <div className="max-w-3xl mx-auto">
+        <Card className="p-6">
         <header className="mb-6">
           <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Editar grupo</h1>
           <p className="text-slate-600 text-sm mt-1">Ajusta la configuración del equipo para mantener compatibilidad y objetivos claros.</p>
@@ -208,7 +210,7 @@ export default function EditGroupPage() {
         {!canEdit ? (
           <div className="space-y-3">
             <p className="text-slate-600">No tienes permisos para editar este grupo.</p>
-            <Link href={`/groups/${groupId}`} className="btn-outline inline-flex">Volver al grupo</Link>
+            <Link href={`/groups/${groupId}`} className="btn-ghost inline-flex">Volver al grupo</Link>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -301,14 +303,15 @@ export default function EditGroupPage() {
                 {ACTIVITIES.map((activity) => {
                   const selected = formData.activity_focus.includes(activity)
                   return (
-                    <button
+                    <Button
                       key={activity}
                       type="button"
+                      variant={selected ? 'primary' : 'ghost'}
+                      className={`px-3 py-2 text-sm ${selected ? 'border-slate-800' : 'border-slate-200'}`}
                       onClick={() => toggleFocus(activity)}
-                      className={`px-3 py-2 rounded-xl border text-sm transition ${selected ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'}`}
                     >
                       {activity}
-                    </button>
+                    </Button>
                   )
                 })}
               </div>
@@ -338,13 +341,14 @@ export default function EditGroupPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <button type="submit" disabled={saving} className="btn-primary w-full sm:w-auto disabled:opacity-50">
+              <Button type="submit" variant="primary" className="w-full sm:w-auto disabled:opacity-50" disabled={saving}>
                 {saving ? 'Guardando...' : 'Guardar cambios'}
-              </button>
-              <Link href={`/groups/${groupId}`} className="btn-outline w-full sm:w-auto text-center">Cancelar</Link>
+              </Button>
+              <Link href={`/groups/${groupId}`} className="btn-ghost w-full sm:w-auto text-center">Cancelar</Link>
             </div>
           </form>
         )}
+        </Card>
       </div>
     </div>
   )

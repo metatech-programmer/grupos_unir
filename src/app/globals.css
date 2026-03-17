@@ -136,10 +136,10 @@ body {
     transform: translate(0, 0) rotate(0deg) scale(1);
   }
   33% {
-    transform: translate(12px, -18px) rotate(2deg) scale(1.05);
+    transform: translate(8px, -10px, 0) rotate(1deg) scale(1.03);
   }
   66% {
-    transform: translate(-8px, 14px) rotate(-1deg) scale(0.98);
+    transform: translate(-6px, 8px, 0) rotate(-0.5deg) scale(0.97);
   }
   100% {
     transform: translate(0, 0) rotate(0deg) scale(1);
@@ -149,11 +149,11 @@ body {
 @keyframes circle-pulse {
   0%, 100% {
     transform: scale(1);
-    opacity: 0.4;
+    opacity: 0.25;
   }
   50% {
-    transform: scale(1.08);
-    opacity: 0.25;
+    transform: scale(1.06);
+    opacity: 0.18;
   }
 }
 
@@ -162,7 +162,7 @@ body {
     transform: translateY(0) rotateZ(0deg);
   }
   50% {
-    transform: translateY(-6px) rotateZ(1deg);
+    transform: translateY(-4px) rotateZ(0.5deg);
   }
   100% {
     transform: translateY(0) rotateZ(0deg);
@@ -181,55 +181,58 @@ body {
   position: absolute;
   display: block;
   mix-blend-mode: screen;
+  opacity: 0.35;
 }
 
 .ambient-svg-1 {
-  width: 320px;
-  height: 300px;
-  top: 8%;
-  left: 5%;
-  animation: blob-float 15s ease-in-out infinite;
+  width: clamp(200px, 35vw, 380px);
+  height: clamp(180px, 32vw, 350px);
+  top: 5%;
+  left: max(-5%, -100px);
+  animation: blob-float 18s ease-in-out infinite;
 }
 
 .ambient-svg-2 {
-  width: 280px;
-  height: 270px;
-  top: 20%;
-  right: 12%;
-  animation: blob-float 18s ease-in-out infinite reverse;
+  width: clamp(180px, 30vw, 320px);
+  height: clamp(160px, 28vw, 300px);
+  top: 18%;
+  right: max(-8%, -120px);
+  animation: blob-float 20s ease-in-out infinite reverse;
 }
 
 .ambient-svg-3 {
-  width: 320px;
-  height: 200px;
-  bottom: 8%;
-  left: 8%;
-  animation: wave-undulate 10s ease-in-out infinite;
+  width: clamp(220px, 36vw, 380px);
+  height: clamp(120px, 18vw, 200px);
+  bottom: 35%;
+  left: max(-5%, -80px);
+  animation: wave-undulate 12s ease-in-out infinite;
 }
 
 .ambient-svg-4 {
-  width: 300px;
-  height: 280px;
-  bottom: 5%;
-  right: 5%;
-  animation: blob-float 22s ease-in-out infinite reverse;
+  width: clamp(200px, 32vw, 340px);
+  height: clamp(180px, 30vw, 320px);
+  bottom: 8%;
+  right: max(-8%, -100px);
+  animation: blob-float 24s ease-in-out infinite reverse;
 }
 
 .ambient-svg-5 {
-  width: 200px;
-  height: 200px;
-  top: 45%;
-  right: 8%;
-  animation: circle-pulse 8s ease-in-out infinite;
+  width: clamp(120px, 20vw, 220px);
+  height: clamp(120px, 20vw, 220px);
+  top: 40%;
+  right: 12%;
+  animation: circle-pulse 9s ease-in-out infinite;
+  opacity: 0.25;
 }
 
 .ambient-svg-6 {
-  width: 400px;
-  height: 120px;
-  top: 35%;
+  width: clamp(280px, 50vw, 480px);
+  height: clamp(80px, 14vw, 140px);
+  top: 32%;
   left: 50%;
   transform: translateX(-50%);
-  animation: wave-undulate 12s ease-in-out infinite;
+  animation: wave-undulate 14s ease-in-out infinite;
+  opacity: 0.3;
 }
 
 .ambient-shape {
@@ -382,6 +385,30 @@ body {
     background-color: #fff;
   }
 
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-4 sm:px-5 py-2.5 rounded-xl border font-semibold text-center leading-tight transition-all duration-200;
+    background: transparent;
+    color: var(--brand-700);
+    border-color: transparent;
+  }
+
+  .btn-ghost:hover {
+    background-color: rgba(15,23,42,0.04);
+  }
+
+  .btn-primary:focus-visible,
+  .btn-outline:focus-visible,
+  .btn-ghost:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+  }
+
+  a:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.16);
+    border-radius: 10px;
+  }
+
   .card {
     @apply rounded-2xl p-4 sm:p-6;
     border: 1px solid var(--line);
@@ -484,6 +511,16 @@ html[data-theme='dark'] .btn-outline:hover {
   background: linear-gradient(180deg, rgba(20, 40, 74, 0.72), rgba(20, 40, 74, 0.56));
 }
 
+html[data-theme='dark'] .btn-ghost {
+  background: transparent;
+  color: #e6edf7;
+  border-color: rgba(255,255,255,0.06);
+}
+
+html[data-theme='dark'] .btn-ghost:hover {
+  background: rgba(255,255,255,0.03);
+}
+
 html[data-theme='dark'] .input-modern {
   background-color: rgba(14, 31, 58, 0.78);
   border-color: rgba(125, 211, 252, 0.22);
@@ -502,6 +539,74 @@ html[data-theme='dark'] .hero-grid {
 
 html[data-theme='dark'] .ambient-svg {
   mix-blend-mode: overlay;
+  opacity: 0.4;
+}
+
+html[data-theme='dark'] .ambient-svg-5 {
+  opacity: 0.3;
+}
+
+html[data-theme='dark'] .ambient-svg-6 {
+  opacity: 0.35;
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  .ambient-svg-1 {
+    top: 8%;
+    left: -10%;
+  }
+
+  .ambient-svg-2 {
+    top: 15%;
+    right: -15%;
+  }
+
+  .ambient-svg-3 {
+    bottom: 40%;
+    left: -5%;
+  }
+
+  .ambient-svg-4 {
+    bottom: 5%;
+    right: -12%;
+  }
+
+  .ambient-svg-5 {
+    top: 48%;
+    right: 5%;
+    width: 140px;
+    height: 140px;
+  }
+
+  .ambient-svg-6 {
+    top: 38%;
+    width: 280px;
+    height: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ambient-svg {
+    opacity: 0.25;
+  }
+
+  .ambient-svg-1,
+  .ambient-svg-2,
+  .ambient-svg-3,
+  .ambient-svg-4 {
+    animation-duration: 20s;
+  }
+
+  .ambient-svg-5 {
+    opacity: 0.15;
+    animation-duration: 10s;
+  }
+
+  .ambient-svg-6 {
+    opacity: 0.2;
+    animation-duration: 16s;
+  }
 }
 
 html[data-theme='dark'] .bg-white,

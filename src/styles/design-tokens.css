@@ -1,0 +1,48 @@
+/* Design tokens: colors, type scale and spacing for the system
+   Used as a reference and imported by globals where appropriate. */
+
+:root {
+  /* Brand */
+  --brand-900: #0f172a;
+  --brand-700: #1d4ed8;
+  --brand-500: #2563eb;
+  --brand-300: #60a5fa;
+
+  /* Accent */
+  --mint-500: #15b79e;
+
+  /* Neutral */
+  --bg-0: #ffffff;
+  --bg-1: #f7fafc;
+  --ink-900: #0f172a;
+  --ink-700: #334155;
+
+  /* Elevation */
+  --surface-0: rgba(255,255,255,0.96);
+  --surface-1: rgba(15,29,54,0.84);
+
+  /* Spacing scale (base: 4px) */
+  --space-1: 0.25rem; /*4px*/
+  --space-2: 0.5rem;  /*8px*/
+  --space-3: 0.75rem; /*12px*/
+  --space-4: 1rem;    /*16px*/
+  --space-5: 1.5rem;  /*24px*/
+
+  /* Type scale */
+  --fs-base: 16px;
+  --fs-sm: 0.875rem; /*14px*/
+  --fs-lg: 1.125rem; /*18px*/
+  --fs-hero: clamp(1.75rem, 3.5vw, 3.75rem);
+}
+
+html[data-theme='dark'] {
+  --bg-0: #050712;
+  --ink-900: #e6edf7;
+  --ink-700: #9aacbf;
+  --surface-0: rgba(15,29,54,0.86);
+}
+
+/* Utility: import in components for direct CSS variable use */
+.design-token-demo { display: none; }
+
+/* End tokens */

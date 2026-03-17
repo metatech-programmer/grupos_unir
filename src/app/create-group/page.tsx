@@ -1,4 +1,4 @@
-﻿'use client'
+﻿ 'use client'
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -7,6 +7,7 @@ import { SUBJECTS } from '@/lib/subjects'
 import { ACTIVITIES, DAILY_HOURS, WORK_STATUS, SCHEDULE_SLOTS } from '@/lib/profile-options'
 import { TeamIcon } from '@/components/icons'
 import LoadingScreen from '@/components/LoadingScreen'
+import { Button, Input, Card } from '@/components/ui'
 
 export default function CreateGroupPage() {
   const router = useRouter()
@@ -14,6 +15,7 @@ export default function CreateGroupPage() {
   const [authChecked, setAuthChecked] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [formData, setFormData] = useState({
     name: '',
     subject: SUBJECTS[0],
@@ -148,18 +150,25 @@ export default function CreateGroupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setFieldErrors({})
     setLoading(true)
 
     try {
-      if (!formData.name.trim()) throw new Error('El nombre del grupo es obligatorio')
-      if (formData.max_size < 3 || formData.max_size > 5) throw new Error('El grupo debe tener entre 3 y 5 integrantes')
-      if (formData.active_hours_end <= formData.active_hours_start) throw new Error('El horario del grupo no es válido')
-      if (formData.activity_focus.length === 0) throw new Error('Selecciona al menos una actividad objetivo')
+      const errors: Record<string, string> = {}
+      if (!formData.name.trim()) errors.name = 'El nombre del grupo es obligatorio'
+      if (formData.max_size < 3 || formData.max_size > 5) errors.max_size = 'El grupo debe tener entre 3 y 5 integrantes'
+      if (formData.active_hours_end <= formData.active_hours_start) errors.active_hours = 'El horario del grupo no es válido'
+      if (formData.activity_focus.length === 0) errors.activity_focus = 'Selecciona al menos una actividad objetivo'
+
+      const selectedSubject = formData.subject === 'Otro' ? formData.customSubject.trim() : formData.subject
+      if (!selectedSubject) errors.subject = 'Selecciona o escribe una asignatura'
+
+      if (Object.keys(errors).length) {
+        setFieldErrors(errors)
+        throw new Error('Corrige los errores del formulario')
+      }
 
       await ensureUserProfile()
-      const selectedSubject = formData.subject === 'Otro' ? formData.customSubject.trim() : formData.subject
-      if (!selectedSubject) throw new Error('Selecciona o escribe una asignatura')
-
       const { data: createdGroupId, error: createGroupError } = await supabase.rpc('create_group_atomic', {
         p_name: formData.name.trim(),
         p_subject: selectedSubject,
@@ -188,104 +197,110 @@ export default function CreateGroupPage() {
 
   return (
     <div className="min-h-screen px-4 py-8 md:py-14">
-      <div className="max-w-3xl mx-auto card">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Crear Grupo</h1>
-            <p className="text-slate-600 mt-2">Define estructura, disponibilidad y foco de actividades para recibir mejores recomendaciones.</p>
-          </div>
-          <div className="h-12 w-12 rounded-xl bg-slate-900 text-white flex items-center justify-center">
-            <TeamIcon className="h-6 w-6" />
-          </div>
-        </div>
-
-        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid md:grid-cols-2 gap-4">
+      <div className="max-w-3xl mx-auto">
+        <Card className="p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre del Grupo</label>
-              <input type="text" name="name" value={formData.name} onChange={handleChange} className="input-modern" placeholder="Equipo Producto Internacional" required />
+              <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-sora)' }}>Crear Grupo</h1>
+              <p className="text-slate-600 mt-2">Define estructura, disponibilidad y foco de actividades para recibir mejores recomendaciones.</p>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Asignatura</label>
-              <select name="subject" value={formData.subject} onChange={handleChange} className="input-modern">
-                {SUBJECTS.map(subject => <option key={subject} value={subject}>{subject}</option>)}
-              </select>
+            <div className="h-12 w-12 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+              <TeamIcon className="h-6 w-6" />
             </div>
           </div>
 
-          {formData.subject === 'Otro' && (
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Asignatura personalizada</label>
-              <input type="text" name="customSubject" value={formData.customSubject} onChange={handleChange} className="input-modern" placeholder="Escribe la asignatura" required />
-            </div>
-          )}
+          {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Máximo integrantes</label>
-              <select name="max_size" value={formData.max_size} onChange={handleChange} className="input-modern">
-                <option value={3}>3 integrantes</option>
-                <option value={4}>4 integrantes</option>
-                <option value={5}>5 integrantes</option>
-              </select>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <Input label="Nombre del Grupo" name="name" value={formData.name} onChange={handleChange} placeholder="Equipo Producto Internacional" />
+                {fieldErrors.name && <p className="text-sm text-red-600 mt-1">{fieldErrors.name}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Asignatura</label>
+                <select name="subject" value={formData.subject} onChange={handleChange} className="input-modern">
+                  {SUBJECTS.map(subject => <option key={subject} value={subject}>{subject}</option>)}
+                </select>
+                {fieldErrors.subject && <p className="text-sm text-red-600 mt-1">{fieldErrors.subject}</p>}
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Ritmo laboral objetivo</label>
-              <select name="preferred_work_style" value={formData.preferred_work_style} onChange={handleChange} className="input-modern">
-                <option value="flexible">Flexible</option>
-                {WORK_STATUS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Horas recomendadas al día</label>
-              <select name="required_daily_hours" value={formData.required_daily_hours} onChange={handleChange} className="input-modern">
-                {DAILY_HOURS.map(h => <option key={h} value={h}>{h} horas</option>)}
-              </select>
-            </div>
-          </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Inicio franja activa</label>
-              <select name="active_hours_start" value={formData.active_hours_start} onChange={handleChange} className="input-modern">
-                {SCHEDULE_SLOTS.map(slot => <option key={slot.value} value={slot.value}>{slot.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Fin franja activa</label>
-              <select name="active_hours_end" value={formData.active_hours_end} onChange={handleChange} className="input-modern">
-                {SCHEDULE_SLOTS.map(slot => <option key={slot.value} value={slot.value}>{slot.label}</option>)}
-              </select>
-            </div>
-          </div>
+            {formData.subject === 'Otro' && (
+              <div>
+                <Input label="Asignatura personalizada" name="customSubject" value={formData.customSubject} onChange={handleChange} placeholder="Escribe la asignatura" />
+              </div>
+            )}
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Actividades foco del equipo</label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {ACTIVITIES.map(activity => {
-                const selected = formData.activity_focus.includes(activity)
-                return (
-                  <button
-                    key={activity}
-                    type="button"
-                    onClick={() => toggleFocus(activity)}
-                    className={`px-3 py-2 rounded-xl border text-sm transition ${selected ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'}`}
-                  >
-                    {activity}
-                  </button>
-                )
-              })}
+            <div className="grid md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Máximo integrantes</label>
+                <select name="max_size" value={formData.max_size} onChange={handleChange} className="input-modern">
+                  <option value={3}>3 integrantes</option>
+                  <option value={4}>4 integrantes</option>
+                  <option value={5}>5 integrantes</option>
+                </select>
+                {fieldErrors.max_size && <p className="text-sm text-red-600 mt-1">{fieldErrors.max_size}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Ritmo laboral objetivo</label>
+                <select name="preferred_work_style" value={formData.preferred_work_style} onChange={handleChange} className="input-modern">
+                  <option value="flexible">Flexible</option>
+                  {WORK_STATUS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Horas recomendadas al día</label>
+                <select name="required_daily_hours" value={formData.required_daily_hours} onChange={handleChange} className="input-modern">
+                  {DAILY_HOURS.map(h => <option key={h} value={h}>{h} horas</option>)}
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:justify-items-start">
-            <button type="submit" disabled={loading} className="btn-primary w-full sm:w-auto disabled:opacity-50">
-              {loading ? 'Creando grupo...' : 'Crear Grupo'}
-            </button>
-          </div>
-        </form>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Inicio franja activa</label>
+                <select name="active_hours_start" value={formData.active_hours_start} onChange={handleChange} className="input-modern">
+                  {SCHEDULE_SLOTS.map(slot => <option key={slot.value} value={slot.value}>{slot.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Fin franja activa</label>
+                <select name="active_hours_end" value={formData.active_hours_end} onChange={handleChange} className="input-modern">
+                  {SCHEDULE_SLOTS.map(slot => <option key={slot.value} value={slot.value}>{slot.label}</option>)}
+                </select>
+                {fieldErrors.active_hours && <p className="text-sm text-red-600 mt-1">{fieldErrors.active_hours}</p>}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Actividades foco del equipo</label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {ACTIVITIES.map(activity => {
+                  const selected = formData.activity_focus.includes(activity)
+                  return (
+                    <Button
+                      key={activity}
+                      type="button"
+                      variant={selected ? 'primary' : 'ghost'}
+                      className={`px-3 py-2 text-sm ${selected ? 'border-slate-800' : 'border-slate-200'}`}
+                      onClick={() => toggleFocus(activity)}
+                    >
+                      {activity}
+                    </Button>
+                  )
+                })}
+              </div>
+              {fieldErrors.activity_focus && <p className="text-sm text-red-600 mt-2">{fieldErrors.activity_focus}</p>}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:justify-items-start">
+              <Button type="submit" variant="primary" className="w-full sm:w-auto disabled:opacity-50" disabled={loading}>
+                {loading ? 'Creando grupo...' : 'Crear Grupo'}
+              </Button>
+            </div>
+          </form>
+        </Card>
       </div>
     </div>
   )

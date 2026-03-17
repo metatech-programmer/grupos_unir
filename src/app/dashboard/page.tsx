@@ -134,7 +134,7 @@ export default function DashboardPage() {
             <p><strong>Horario:</strong> {String(user.availability_start).padStart(2, '0')}:00 - {String(user.availability_end).padStart(2, '0')}:00</p>
             <p><strong>Actividades:</strong> {(user.activities || []).join(', ')}</p>
           </div>
-          <Link href="/profile" className="btn-outline mt-5 inline-flex">Actualizar perfil</Link>
+          <Link href="/profile" className="btn-ghost mt-5 inline-flex">Actualizar perfil</Link>
         </section>
 
         <section className="card lg:col-span-2">
@@ -156,9 +156,9 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
             <Link href="/explore" className="btn-primary text-center">Explorar grupos sugeridos</Link>
-            {!adminGroupId && <Link href="/create-group" className="btn-outline text-center">Crear grupo nuevo</Link>}
+            {!adminGroupId && <Link href="/create-group" className="btn-ghost text-center">Crear grupo nuevo</Link>}
           </div>
 
           {user.group_id && (
