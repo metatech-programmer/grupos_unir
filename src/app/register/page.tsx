@@ -125,9 +125,22 @@ export default function RegisterPage() {
       }
 
       if (authData.user) {
-        if (!authData.session) {
-          setError('En este proyecto aún está activa la verificación por correo. Desactiva Confirm email en Supabase Auth para registrar sin confirmación.')
-          return
+        let activeSession = authData.session
+
+        // Some Supabase projects return no session on signUp depending on confirmation settings.
+        // Try to sign in immediately so the flow works whether confirmation is on or off.
+        if (!activeSession) {
+          const { data: signInData } = await supabase.auth.signInWithPassword({
+            email: formData.email,
+            password: formData.password,
+          })
+
+          activeSession = signInData.session
+
+          if (!activeSession) {
+            setError('Tu cuenta fue creada, pero requiere confirmación por correo antes de iniciar sesión.')
+            return
+          }
         }
 
         const { error: dbError } = await supabase.from('users').insert([
