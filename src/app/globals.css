@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --bg-soft: #f8fafc;
+  --bg-soft: #f3f7ff;
   --ink-strong: #0f172a;
   --ink-muted: #475569;
   --line: #d9e2f1;
@@ -15,7 +15,7 @@
 }
 
 html[data-theme='dark'] {
-  --bg-soft: #060d1c;
+  --bg-soft: #030712;
   --ink-strong: #e6edf7;
   --ink-muted: #9aacbf;
   --line: #2b4261;
@@ -28,15 +28,15 @@ html[data-theme='dark'] {
 body {
   color: var(--ink-strong);
   background:
-    radial-gradient(900px 320px at 10% -10%, rgba(51, 65, 85, 0.06), transparent),
-    radial-gradient(700px 280px at 100% 0%, rgba(148, 163, 184, 0.08), transparent),
+    radial-gradient(920px 340px at 12% -12%, rgba(59, 130, 246, 0.08), transparent),
+    radial-gradient(760px 300px at 100% 0%, rgba(56, 189, 248, 0.08), transparent),
     var(--bg-soft);
 }
 
 html[data-theme='dark'] body {
   background:
-    radial-gradient(900px 320px at 10% -10%, rgba(15, 29, 54, 0.52), transparent),
-    radial-gradient(700px 280px at 100% 0%, rgba(7, 16, 34, 0.7), transparent),
+    radial-gradient(950px 360px at 8% -12%, rgba(37, 99, 235, 0.22), transparent),
+    radial-gradient(760px 320px at 100% 0%, rgba(3, 7, 18, 0.86), transparent),
     var(--bg-soft);
 }
 
