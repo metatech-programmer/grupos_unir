@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ThemeToggle from '@/components/ThemeToggle'
 import InstallAppButton from '@/components/InstallAppButton'
@@ -12,10 +12,46 @@ import ConfirmModal from '@/components/ConfirmModal'
 
 export default function SettingsPage() {
   const router = useRouter()
+  const [adminGroupId, setAdminGroupId] = useState<string | null>(null)
   const [deletingAccount, setDeletingAccount] = useState(false)
   const [dangerError, setDangerError] = useState('')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteKeyword, setDeleteKeyword] = useState('')
+
+  useEffect(() => {
+    const loadAdminMembership = async () => {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const authId = sessionData.session?.user?.id
+
+      if (!authId) {
+        setAdminGroupId(null)
+        return
+      }
+
+      const { data: profile } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', authId)
+        .maybeSingle()
+
+      if (!profile?.id) {
+        setAdminGroupId(null)
+        return
+      }
+
+      const { data: adminMembership } = await supabase
+        .from('group_members')
+        .select('group_id')
+        .eq('user_id', profile.id)
+        .eq('role', 'admin')
+        .limit(1)
+        .maybeSingle()
+
+      setAdminGroupId(adminMembership?.group_id || null)
+    }
+
+    loadAdminMembership()
+  }, [])
 
   const handleDeleteAccount = async () => {
     if (deletingAccount) return
@@ -99,7 +135,7 @@ export default function SettingsPage() {
           <div className="grid sm:grid-cols-3 gap-3">
             <Link href="/dashboard" className="btn-outline text-center">Dashboard</Link>
             <Link href="/explore" className="btn-outline text-center">Explorar</Link>
-            <Link href="/create-group" className="btn-outline text-center">Crear grupo</Link>
+            {!adminGroupId && <Link href="/create-group" className="btn-outline text-center">Crear grupo</Link>}
           </div>
         </section>
 

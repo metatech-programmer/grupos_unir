@@ -1,7 +1,9 @@
 ﻿'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { ActivityIcon, BrainIcon, ClockIcon } from '@/components/icons'
+import { supabase } from '@/lib/supabase'
 
 const features = [
   {
@@ -22,6 +24,43 @@ const features = [
 ]
 
 export default function Home() {
+  const [adminGroupId, setAdminGroupId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const loadAdminMembership = async () => {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const authId = sessionData.session?.user?.id
+
+      if (!authId) {
+        setAdminGroupId(null)
+        return
+      }
+
+      const { data: profile } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', authId)
+        .maybeSingle()
+
+      if (!profile?.id) {
+        setAdminGroupId(null)
+        return
+      }
+
+      const { data: adminMembership } = await supabase
+        .from('group_members')
+        .select('group_id')
+        .eq('user_id', profile.id)
+        .eq('role', 'admin')
+        .limit(1)
+        .maybeSingle()
+
+      setAdminGroupId(adminMembership?.group_id || null)
+    }
+
+    loadAdminMembership()
+  }, [])
+
   return (
     <div className="min-h-screen">
       <main className="max-w-6xl mx-auto px-4 pb-16">
@@ -40,7 +79,7 @@ export default function Home() {
               </p>
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
                 <Link href="/explore" className="btn-primary w-full sm:w-auto">Explorar grupos</Link>
-                <Link href="/create-group" className="btn-outline w-full sm:w-auto">Crear grupo</Link>
+                {!adminGroupId && <Link href="/create-group" className="btn-outline w-full sm:w-auto">Crear grupo</Link>}
               </div>
             </div>
 

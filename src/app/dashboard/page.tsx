@@ -10,6 +10,7 @@ import LoadingScreen from '@/components/LoadingScreen'
 export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
+  const [adminGroupId, setAdminGroupId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
 
@@ -80,6 +81,16 @@ export default function DashboardPage() {
         }
 
         setUser(userData)
+
+        const { data: adminMembership } = await supabase
+          .from('group_members')
+          .select('group_id')
+          .eq('user_id', userData.id)
+          .eq('role', 'admin')
+          .limit(1)
+          .maybeSingle()
+
+        setAdminGroupId(adminMembership?.group_id || null)
       } catch (error) {
         console.error('Error checking auth:', error)
         router.push('/login')
@@ -147,7 +158,7 @@ export default function DashboardPage() {
 
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/explore" className="btn-primary text-center">Explorar grupos sugeridos</Link>
-            <Link href="/create-group" className="btn-outline text-center">Crear grupo nuevo</Link>
+            {!adminGroupId && <Link href="/create-group" className="btn-outline text-center">Crear grupo nuevo</Link>}
           </div>
 
           {user.group_id && (

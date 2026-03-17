@@ -12,6 +12,7 @@ import LoadingScreen from '@/components/LoadingScreen'
 export default function ExplorePage() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
+  const [adminGroupId, setAdminGroupId] = useState<string | null>(null)
   const [isChangeMode, setIsChangeMode] = useState(false)
   const [suggestions, setSuggestions] = useState<GroupSuggestion[]>([])
   const [allGroups, setAllGroups] = useState<Group[]>([])
@@ -127,8 +128,24 @@ export default function ExplorePage() {
           }
 
           setUser(userData)
+
+          if (userData?.id) {
+            const { data: adminMembership, error: adminMembershipError } = await supabase
+              .from('group_members')
+              .select('group_id')
+              .eq('user_id', userData.id)
+              .eq('role', 'admin')
+              .limit(1)
+              .maybeSingle()
+
+            if (adminMembershipError) throw adminMembershipError
+            setAdminGroupId(adminMembership?.group_id || null)
+          } else {
+            setAdminGroupId(null)
+          }
         } else {
           setUser(null)
+          setAdminGroupId(null)
         }
 
         setSuggestions(await buildSuggestions(userData, groupsData))
@@ -249,7 +266,7 @@ export default function ExplorePage() {
             <p className="text-xl text-gray-600 mt-4 mb-4">
               {suggestions.length === 0 ? 'No hay grupos disponibles en este momento' : 'No hay grupos para ese filtro'}
             </p>
-            <Link href="/create-group" className="btn-primary">Crear mi propio grupo</Link>
+            {!adminGroupId && <Link href="/create-group" className="btn-primary">Crear mi propio grupo</Link>}
           </div>
         ) : (
           <div className="space-y-5">

@@ -33,6 +33,7 @@ export default function GlobalNav() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [authId, setAuthId] = useState<string | null>(null)
   const [profile, setProfile] = useState<AppUser | null>(null)
+  const [adminGroupId, setAdminGroupId] = useState<string | null>(null)
 
   useEffect(() => {
     const loadSession = async () => {
@@ -42,6 +43,7 @@ export default function GlobalNav() {
 
       if (!currentAuthId) {
         setProfile(null)
+        setAdminGroupId(null)
         return
       }
 
@@ -53,6 +55,20 @@ export default function GlobalNav() {
 
       if (!error) {
         setProfile(profileData)
+
+        if (profileData?.id) {
+          const { data: adminMembership } = await supabase
+            .from('group_members')
+            .select('group_id')
+            .eq('user_id', profileData.id)
+            .eq('role', 'admin')
+            .limit(1)
+            .maybeSingle()
+
+          setAdminGroupId(adminMembership?.group_id || null)
+        } else {
+          setAdminGroupId(null)
+        }
       }
     }
 
@@ -79,17 +95,20 @@ export default function GlobalNav() {
 
     const authLinks: NavLink[] = [
       { href: '/dashboard', label: 'Dashboard', icon: GridIcon },
-      { href: '/create-group', label: 'Crear grupo', icon: PlusIcon },
       { href: '/settings', label: 'Ajustes', icon: SettingsIcon },
       { href: '/profile', label: 'Perfil', icon: UserIcon },
     ]
+
+    if (!adminGroupId) {
+      authLinks.splice(1, 0, { href: '/create-group', label: 'Crear grupo', icon: PlusIcon })
+    }
 
     if (profile?.group_id) {
       authLinks.splice(2, 0, { href: `/groups/${profile.group_id}`, label: 'Mi grupo', icon: TeamIcon })
     }
 
     return [...base, ...authLinks]
-  }, [authId, profile?.group_id])
+  }, [authId, profile?.group_id, adminGroupId])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()

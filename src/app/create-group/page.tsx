@@ -30,11 +30,33 @@ export default function CreateGroupPage() {
     const checkAuth = async () => {
       setMounted(true)
       const { data: { session } } = await supabase.auth.getSession()
-      const user = session?.user
-      if (!user) {
+        const authUser = session?.user
+        if (!authUser) {
         router.push('/login')
         return
       }
+
+        const { data: profile } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', authUser.id)
+          .maybeSingle()
+
+        if (profile?.id) {
+          const { data: adminMembership } = await supabase
+            .from('group_members')
+            .select('group_id')
+            .eq('user_id', profile.id)
+            .eq('role', 'admin')
+            .limit(1)
+            .maybeSingle()
+
+          if (adminMembership?.group_id) {
+            router.push(`/groups/${adminMembership.group_id}`)
+            return
+          }
+        }
+
       setAuthChecked(true)
     }
 
