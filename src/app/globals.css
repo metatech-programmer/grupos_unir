@@ -131,12 +131,41 @@ body {
   }
 }
 
-@keyframes scroll-words-infinite {
+@keyframes blob-float {
   0% {
-    transform: translateX(100%);
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translate(12px, -18px) rotate(2deg) scale(1.05);
+  }
+  66% {
+    transform: translate(-8px, 14px) rotate(-1deg) scale(0.98);
   }
   100% {
-    transform: translateX(-100%);
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes circle-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.25;
+  }
+}
+
+@keyframes wave-undulate {
+  0% {
+    transform: translateY(0) rotateZ(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotateZ(1deg);
+  }
+  100% {
+    transform: translateY(0) rotateZ(0deg);
   }
 }
 
@@ -170,46 +199,98 @@ body {
   display: none;
 }
 
-.ambient-scroll {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: auto;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  opacity: 0.28;
-  font-size: clamp(2rem, 8vw, 5rem);
-  font-weight: 700;
-  color: rgba(37, 99, 235, 0.5);
-  white-space: nowrap;
-  pointer-events: none;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  line-height: 1.1;
-  padding: 2rem 0;
-  z-index: 0;
+.ambient-blob {
+  position: absolute;
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.12), transparent 60%);
+  opacity: 0.6;
+  filter: blur(1px);
+  mix-blend-mode: overlay;
 }
 
-.ambient-scroll-inner {
-  display: flex;
-  gap: 4rem;
-  animation: scroll-words-infinite 50s linear infinite;
-  will-change: transform;
+.ambient-blob-1 {
+  width: 320px;
+  height: 280px;
+  top: 8%;
+  left: 5%;
+  animation: blob-float 15s ease-in-out infinite;
 }
 
-.ambient-scroll-item {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
+.ambient-blob-2 {
+  width: 260px;
+  height: 300px;
+  top: 35%;
+  right: 8%;
+  background: radial-gradient(circle at 60% 40%, rgba(14, 165, 233, 0.1), transparent 60%);
+  animation: blob-float 18s ease-in-out infinite reverse;
 }
 
-.ambient-scroll-item::before {
-  content: '◆';
+.ambient-blob-3 {
+  width: 240px;
+  height: 220px;
+  bottom: 12%;
+  left: 12%;
+  background: radial-gradient(circle at 45% 55%, rgba(20, 184, 166, 0.08), transparent 60%);
+  animation: blob-float 20s ease-in-out infinite;
+}
+
+.ambient-blob-4 {
+  width: 300px;
+  height: 250px;
+  bottom: 5%;
+  right: 5%;
+  background: radial-gradient(circle at 35% 55%, rgba(37, 99, 235, 0.09), transparent 65%);
+  animation: blob-float 22s ease-in-out infinite reverse;
+}
+
+.ambient-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(37, 99, 235, 0.15);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.06) 0%, transparent 70%);
+}
+
+.ambient-circle-1 {
+  width: 180px;
+  height: 180px;
+  top: 20%;
+  right: 25%;
+  animation: circle-pulse 6s ease-in-out infinite;
+}
+
+.ambient-circle-2 {
+  width: 220px;
+  height: 220px;
+  bottom: 18%;
+  right: 12%;
+  border-color: rgba(14, 165, 233, 0.12);
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.05) 0%, transparent 70%);
+  animation: circle-pulse 7s ease-in-out infinite 0.5s;
+}
+
+.ambient-wave {
+  position: absolute;
   opacity: 0.4;
-  font-size: 0.6em;
+}
+
+.ambient-wave-1 {
+  width: 100%;
+  height: 200px;
+  top: 25%;
+  left: 0;
+  background: url('data:image/svg+xml,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad1" x1="0%25" y1="0%25" x2="0%25" y2="100%25"><stop offset="0%25" style="stop-color:rgba(59,130,246,0.1);stop-opacity:1" /><stop offset="100%25" style="stop-color:rgba(59,130,246,0);stop-opacity:1" /></linearGradient></defs><path d="M0,40 Q300,10 600,40 T1200,40 L1200,120 L0,120 Z" fill="url(%23grad1)" stroke="rgba(37,99,235,0.08)" stroke-width="1.5"/></svg>') no-repeat center;
+  background-size: cover;
+  animation: wave-undulate 8s ease-in-out infinite;
+}
+
+.ambient-wave-2 {
+  width: 100%;
+  height: 160px;
+  bottom: 15%;
+  left: 0;
+  background: url('data:image/svg+xml,<svg viewBox="0 0 1200 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad2" x1="0%25" y1="0%25" x2="0%25" y2="100%25"><stop offset="0%25" style="stop-color:rgba(20,184,166,0.08);stop-opacity:1" /><stop offset="100%25" style="stop-color:rgba(20,184,166,0);stop-opacity:1" /></linearGradient></defs><path d="M0,30 Q400,60 800,30 T1600,30 L1600,100 L0,100 Z" fill="url(%23grad2)" stroke="rgba(20,184,166,0.06)" stroke-width="1"/></svg>') no-repeat center;
+  background-size: cover;
+  animation: wave-undulate 10s ease-in-out infinite 1s reverse;
 }
 
 .page-enter {
@@ -363,9 +444,30 @@ html[data-theme='dark'] .hero-grid {
     linear-gradient(to bottom, rgba(148, 163, 184, 0.14) 1px, transparent 1px);
 }
 
-html[data-theme='dark'] .ambient-scroll {
-  color: rgba(59, 130, 246, 0.35);
-  opacity: 0.3;
+html[data-theme='dark'] .ambient-blob-1 {
+  background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.14), transparent 60%);
+}
+
+html[data-theme='dark'] .ambient-blob-2 {
+  background: radial-gradient(circle at 60% 40%, rgba(30, 144, 255, 0.12), transparent 60%);
+}
+
+html[data-theme='dark'] .ambient-blob-3 {
+  background: radial-gradient(circle at 45% 55%, rgba(20, 184, 166, 0.1), transparent 60%);
+}
+
+html[data-theme='dark'] .ambient-blob-4 {
+  background: radial-gradient(circle at 35% 55%, rgba(37, 99, 235, 0.11), transparent 65%);
+}
+
+html[data-theme='dark'] .ambient-circle-1 {
+  border-color: rgba(59, 130, 246, 0.18);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+}
+
+html[data-theme='dark'] .ambient-circle-2 {
+  border-color: rgba(30, 144, 255, 0.16);
+  background: radial-gradient(circle, rgba(30, 144, 255, 0.07) 0%, transparent 70%);
 }
 
 html[data-theme='dark'] .bg-white,
