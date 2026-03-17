@@ -63,7 +63,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <main className="max-w-6xl mx-auto px-4 pb-16">
+      <main className="max-w-6xl mx-auto px-4 py-16">
         <section className="hero-grid card overflow-hidden relative">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
