@@ -16,6 +16,20 @@ type GroupMemberWithRole = {
   user: User
 }
 
+type MessageBroadcastPayload = {
+  id: string
+  group_id: string
+  user_id: string
+  message: string
+  created_at: string
+  author: Pick<User, 'id' | 'name' | 'email' | 'phone'> | null
+}
+
+type DeleteBroadcastPayload = {
+  id: string
+  group_id: string
+}
+
 const isTemporaryMessageId = (messageId: string) => messageId.startsWith('temp-')
 
 const normalizeMessages = (rawMessages: unknown[]): MessageWithAuthor[] => {
@@ -42,6 +56,10 @@ const getInitials = (fullName: string) => {
   if (parts.length === 0) return 'U'
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
   return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+}
+
+const sortMessagesByCreatedAt = (a: MessageWithAuthor, b: MessageWithAuthor) => {
+  return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
 }
 
 export default function GroupDetailPage() {
@@ -292,6 +310,38 @@ export default function GroupDetailPage() {
           setMessages(normalizeMessages(data || []))
         }
       })
+      .on('broadcast', { event: 'message_sent' }, ({ payload }) => {
+        const incoming = payload as MessageBroadcastPayload
+        if (!incoming?.id || incoming.group_id !== groupId) return
+
+        const nextMessage: MessageWithAuthor = {
+          id: incoming.id,
+          group_id: incoming.group_id,
+          user_id: incoming.user_id,
+          message: incoming.message,
+          created_at: incoming.created_at,
+          users: incoming.author,
+        }
+
+        setMessages((prev) => {
+          const withoutTemp = prev.filter((message) => {
+            if (!isTemporaryMessageId(message.id)) return true
+            return !(message.user_id === incoming.user_id && message.message === incoming.message)
+          })
+
+          if (withoutTemp.some((message) => message.id === incoming.id)) {
+            return withoutTemp
+          }
+
+          return [...withoutTemp, nextMessage].sort(sortMessagesByCreatedAt)
+        })
+      })
+      .on('broadcast', { event: 'message_deleted' }, ({ payload }) => {
+        const incoming = payload as DeleteBroadcastPayload
+        if (!incoming?.id || incoming.group_id !== groupId) return
+
+        setMessages((prev) => prev.filter((message) => message.id !== incoming.id))
+      })
       .on('presence', { event: 'sync' }, () => {
         syncTypingUsers(channel)
       })
@@ -356,15 +406,33 @@ export default function GroupDetailPage() {
 
     try {
       setSending(true)
-      const { error: insertError } = await supabase
+      const { data: insertedMessage, error: insertError } = await supabase
         .from('group_messages')
         .insert({
           group_id: groupId,
           user_id: currentUser.id,
           message: trimmedMessage,
         })
+        .select('id, group_id, user_id, message, created_at')
+        .single()
 
       if (insertError) throw insertError
+
+      if (insertedMessage && chatChannelRef.current) {
+        await chatChannelRef.current.send({
+          type: 'broadcast',
+          event: 'message_sent',
+          payload: {
+            ...insertedMessage,
+            author: {
+              id: currentUser.id,
+              name: currentUser.name,
+              email: currentUser.email,
+              phone: currentUser.phone,
+            },
+          } satisfies MessageBroadcastPayload,
+        })
+      }
 
       const { data: sessionData } = await supabase.auth.getSession()
       const accessToken = sessionData.session?.access_token
@@ -421,6 +489,17 @@ export default function GroupDetailPage() {
         .eq('user_id', currentUser.id)
 
       if (deleteError) throw deleteError
+
+      if (chatChannelRef.current) {
+        await chatChannelRef.current.send({
+          type: 'broadcast',
+          event: 'message_deleted',
+          payload: {
+            id: messageId,
+            group_id: groupId,
+          } satisfies DeleteBroadcastPayload,
+        })
+      }
     } catch (err) {
       setMessages(previousMessages)
       setError(err instanceof Error ? err.message : 'No se pudo eliminar el mensaje')
