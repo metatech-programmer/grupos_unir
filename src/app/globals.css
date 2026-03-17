@@ -27,17 +27,11 @@ html[data-theme='dark'] {
 
 body {
   color: var(--ink-strong);
-  background:
-    radial-gradient(920px 340px at 12% -12%, rgba(59, 130, 246, 0.08), transparent),
-    radial-gradient(760px 300px at 100% 0%, rgba(56, 189, 248, 0.08), transparent),
-    var(--bg-soft);
+  background: linear-gradient(135deg, #0a1628 0%, #0f1f35 50%, #0a1628 100%);
 }
 
 html[data-theme='dark'] body {
-  background:
-    radial-gradient(950px 360px at 8% -12%, rgba(37, 99, 235, 0.22), transparent),
-    radial-gradient(760px 320px at 100% 0%, rgba(3, 7, 18, 0.86), transparent),
-    var(--bg-soft);
+  background: linear-gradient(135deg, #050a14 0%, #0a1628 50%, #050a14 100%);
 }
 
 html,
@@ -148,47 +142,52 @@ body {
 .ambient-shape {
   position: absolute;
   display: block;
-  border-radius: 9999px;
-  opacity: 0.42;
+  opacity: 0.35;
 }
 
 .ambient-shape-1 {
-  width: min(44vw, 560px);
-  height: min(44vw, 560px);
-  top: -14%;
-  left: -10%;
-  background: radial-gradient(circle at 30% 30%, rgba(30, 58, 138, 0.48), rgba(30, 58, 138, 0));
-  animation: drift-float 18s ease-in-out infinite;
+  width: min(64vw, 800px);
+  height: min(64vw, 800px);
+  top: -18%;
+  left: -12%;
+  border: 2px solid rgba(37, 99, 235, 0.18);
+  border-radius: 0;
+  background: linear-gradient(45deg, rgba(30, 64, 175, 0.08) 0%, transparent 45%, transparent 55%, rgba(30, 64, 175, 0.04) 100%);
+  clip-path: polygon(0% 0%, 100% 0%, 85% 70%, 50% 100%, 0% 85%);
+  animation: drift-float 22s ease-in-out infinite;
 }
 
 .ambient-shape-2 {
-  width: min(38vw, 460px);
-  height: min(38vw, 460px);
-  top: 10%;
-  right: -8%;
-  background: radial-gradient(circle at 60% 35%, rgba(25, 55, 135, 0.44), rgba(25, 55, 135, 0));
-  animation: drift-float 20s ease-in-out infinite reverse;
+  width: min(56vw, 680px);
+  height: min(56vw, 680px);
+  top: 8%;
+  right: -10%;
+  border: 1.5px solid rgba(14, 165, 233, 0.14);
+  background: linear-gradient(135deg, transparent 0%, rgba(14, 165, 233, 0.06) 35%, transparent 70%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  animation: drift-float 24s ease-in-out infinite reverse;
 }
 
 .ambient-shape-3 {
-  width: min(32vw, 420px);
-  height: min(32vw, 420px);
-  bottom: -12%;
-  left: 28%;
-  background: radial-gradient(circle at 45% 55%, rgba(15, 120, 110, 0.36), rgba(15, 120, 110, 0));
-  animation: ambient-sway 24s ease-in-out infinite;
+  width: min(48vw, 600px);
+  height: min(48vw, 600px);
+  bottom: -10%;
+  left: 20%;
+  border: 1px solid rgba(20, 184, 166, 0.12);
+  background: linear-gradient(to right, rgba(12, 74, 110, 0.06) 0%, transparent 50%, rgba(12, 74, 110, 0.04) 100%);
+  animation: ambient-sway 26s ease-in-out infinite;
 }
 
 .ambient-grid {
   position: absolute;
   inset: -8%;
   background-image:
-    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: radial-gradient(circle at 50% 30%, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.08) 70%);
-  animation: ambient-sway 26s ease-in-out infinite;
-  opacity: 0.55;
+    linear-gradient(to right, rgba(37, 99, 235, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(37, 99, 235, 0.08) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.05) 65%);
+  animation: ambient-sway 28s ease-in-out infinite;
+  opacity: 0.4;
 }
 
 .page-enter {
@@ -343,22 +342,25 @@ html[data-theme='dark'] .hero-grid {
 }
 
 html[data-theme='dark'] .ambient-shape-1 {
-  background: radial-gradient(circle at 30% 30%, rgba(37, 99, 235, 0.42), rgba(37, 99, 235, 0));
+  border-color: rgba(59, 130, 246, 0.22);
+  background: linear-gradient(45deg, rgba(37, 99, 235, 0.1) 0%, transparent 45%, transparent 55%, rgba(37, 99, 235, 0.05) 100%);
 }
 
 html[data-theme='dark'] .ambient-shape-2 {
-  background: radial-gradient(circle at 60% 35%, rgba(29, 78, 216, 0.38), rgba(29, 78, 216, 0));
+  border-color: rgba(30, 144, 255, 0.18);
+  background: linear-gradient(135deg, transparent 0%, rgba(30, 144, 255, 0.08) 35%, transparent 70%);
 }
 
 html[data-theme='dark'] .ambient-shape-3 {
-  background: radial-gradient(circle at 45% 55%, rgba(12, 74, 110, 0.32), rgba(12, 74, 110, 0));
+  border-color: rgba(32, 201, 188, 0.16);
+  background: linear-gradient(to right, rgba(20, 184, 166, 0.08) 0%, transparent 50%, rgba(20, 184, 166, 0.05) 100%);
 }
 
 html[data-theme='dark'] .ambient-grid {
   background-image:
-    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
-  opacity: 0.3;
+    linear-gradient(to right, rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+  opacity: 0.35;
 }
 
 html[data-theme='dark'] .bg-white,
