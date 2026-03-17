@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { BellIcon } from '@/components/icons'
+import ConfirmModal from '@/components/ConfirmModal'
 
 type PushNotificationsToggleProps = {
   className?: string
@@ -26,6 +27,7 @@ export default function PushNotificationsToggle({ className, compact = false }: 
   const [enabled, setEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
   const [requiresIosInstall, setRequiresIosInstall] = useState(false)
+  const [notice, setNotice] = useState('')
 
   const isSupported = useMemo(() => {
     return typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window
@@ -63,18 +65,18 @@ export default function PushNotificationsToggle({ className, compact = false }: 
     if (!isSupported || loading) return
 
     if (requiresIosInstall) {
-      alert('En iOS primero instala la app en pantalla de inicio y luego activa notificaciones desde la app instalada.')
+      setNotice('En iOS primero instala la app en pantalla de inicio y luego activa notificaciones desde la app instalada.')
       return
     }
 
     const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
     if (!vapidPublicKey) {
-      alert('Falta NEXT_PUBLIC_VAPID_PUBLIC_KEY en las variables de entorno')
+      setNotice('Falta NEXT_PUBLIC_VAPID_PUBLIC_KEY en las variables de entorno.')
       return
     }
 
     if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-      alert('Las notificaciones push solo funcionan con HTTPS o localhost.')
+      setNotice('Las notificaciones push solo funcionan con HTTPS o localhost.')
       return
     }
 
@@ -83,7 +85,7 @@ export default function PushNotificationsToggle({ className, compact = false }: 
 
       const permission = await Notification.requestPermission()
       if (permission !== 'granted') {
-        alert('Debes permitir notificaciones para activarlas.')
+        setNotice('Debes permitir notificaciones para activarlas.')
         return
       }
 
@@ -99,7 +101,7 @@ export default function PushNotificationsToggle({ className, compact = false }: 
 
       const token = await getAccessToken()
       if (!token) {
-        alert('Tu sesión no es válida. Inicia sesión de nuevo.')
+        setNotice('Tu sesión no es válida. Inicia sesión de nuevo.')
         return
       }
 
@@ -120,7 +122,7 @@ export default function PushNotificationsToggle({ className, compact = false }: 
       setEnabled(true)
     } catch (error) {
       console.error(error)
-      alert('No se pudieron activar las notificaciones push')
+      setNotice('No se pudieron activar las notificaciones push.')
     } finally {
       setLoading(false)
     }
@@ -156,7 +158,7 @@ export default function PushNotificationsToggle({ className, compact = false }: 
       setEnabled(false)
     } catch (error) {
       console.error(error)
-      alert('No se pudieron desactivar las notificaciones push')
+      setNotice('No se pudieron desactivar las notificaciones push.')
     } finally {
       setLoading(false)
     }
@@ -170,22 +172,34 @@ export default function PushNotificationsToggle({ className, compact = false }: 
   const baseClass = className || 'btn-outline text-sm'
 
   return (
-    <button
-      type="button"
-      onClick={enabled ? disableNotifications : enableNotifications}
-      disabled={loading}
-      className={`${baseClass} ${enabled ? 'border-emerald-300 text-emerald-700 bg-emerald-50' : ''}`}
-      aria-label={label}
-      title={label}
-    >
-      {compact ? (
-        <span className="inline-flex items-center justify-center relative">
-          <BellIcon className="h-4 w-4" />
-          {enabled && <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500" />}
-        </span>
-      ) : (
-        label
-      )}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={enabled ? disableNotifications : enableNotifications}
+        disabled={loading}
+        className={`${baseClass} ${enabled ? 'border-emerald-300 text-emerald-700 bg-emerald-50' : ''}`}
+        aria-label={label}
+        title={label}
+      >
+        {compact ? (
+          <span className="inline-flex items-center justify-center relative">
+            <BellIcon className="h-4 w-4" />
+            {enabled && <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500" />}
+          </span>
+        ) : (
+          label
+        )}
+      </button>
+
+      <ConfirmModal
+        open={Boolean(notice)}
+        title="Notificaciones"
+        description={notice}
+        confirmLabel="Entendido"
+        onConfirm={() => setNotice('')}
+        onCancel={() => setNotice('')}
+        showCancel={false}
+      />
+    </>
   )
 }

@@ -86,6 +86,17 @@ export default function InstallAppButton({ className, compact = false }: Install
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
+  useEffect(() => {
+    if (!showHelpModal) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [showHelpModal])
+
   const handleInstall = async () => {
     if (!deferredPrompt) return
     await deferredPrompt.prompt()
@@ -153,18 +164,27 @@ export default function InstallAppButton({ className, compact = false }: Install
 
         {showHelpModal && (
           <div
-            className="fixed inset-0 z-[70] bg-slate-950/50"
+            className="fixed inset-0 z-[70] bg-slate-950/65 backdrop-blur-md modal-backdrop-enter"
             onClick={closeHelpModal}
             role="presentation"
           >
             <div className="h-dvh w-full grid place-items-center p-4 overflow-y-auto">
               <div
-                className="card w-full max-w-lg max-h-[90dvh] overflow-y-auto transition-all duration-200 ease-out opacity-100 translate-y-0"
+                className="card relative w-full max-w-lg max-h-[90dvh] overflow-y-auto modal-panel-enter"
                 onClick={(event) => event.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
                 aria-label={`Instalar en ${browserLabel}`}
               >
+                <button
+                  type="button"
+                  onClick={closeHelpModal}
+                  className="absolute right-3 top-3 h-8 w-8 rounded-full border border-slate-300 bg-white/85 text-slate-700 hover:bg-slate-100"
+                  aria-label="Cerrar"
+                  title="Cerrar"
+                >
+                  x
+                </button>
                 <h3 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'var(--font-sora)' }}>
                   Instalar en {browserLabel}
                 </h3>

@@ -1,11 +1,12 @@
 ﻿'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, ReactNode } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase, Group, User, GroupMessage } from '@/lib/supabase'
 import { TeamIcon, ClockIcon, EditIcon, TrashIcon, CheckIcon, CloseIcon } from '@/components/icons'
 import LoadingScreen from '@/components/LoadingScreen'
+import ConfirmModal from '@/components/ConfirmModal'
 
 type MessageWithAuthor = GroupMessage & {
   users?: Pick<User, 'id' | 'name' | 'email' | 'phone'> | null
@@ -68,6 +69,44 @@ const sortMessagesByCreatedAt = (a: MessageWithAuthor, b: MessageWithAuthor) => 
   return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
 }
 
+const renderMessageWithLinks = (text: string, isOwnMessage: boolean): ReactNode[] => {
+  const urlRegex = /((https?:\/\/|www\.)[^\s<]+)/gi
+  const parts: ReactNode[] = []
+  let lastIndex = 0
+
+  for (const match of text.matchAll(urlRegex)) {
+    const matchedUrl = match[0]
+    const start = match.index ?? 0
+    const end = start + matchedUrl.length
+
+    if (start > lastIndex) {
+      parts.push(text.slice(lastIndex, start))
+    }
+
+    const href = matchedUrl.startsWith('http') ? matchedUrl : `https://${matchedUrl}`
+
+    parts.push(
+      <a
+        key={`${matchedUrl}-${start}`}
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className={isOwnMessage ? 'underline underline-offset-2 break-all text-blue-100' : 'underline underline-offset-2 break-all text-blue-700'}
+      >
+        {matchedUrl}
+      </a>
+    )
+
+    lastIndex = end
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex))
+  }
+
+  return parts.length > 0 ? parts : [text]
+}
+
 export default function GroupDetailPage() {
   const router = useRouter()
   const params = useParams()
@@ -86,6 +125,9 @@ export default function GroupDetailPage() {
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
   const [editingMessageText, setEditingMessageText] = useState('')
   const [savingEditMessageId, setSavingEditMessageId] = useState<string | null>(null)
+  const [pendingDeleteMessageId, setPendingDeleteMessageId] = useState<string | null>(null)
+  const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false)
+  const [showLeaveGroupModal, setShowLeaveGroupModal] = useState(false)
   const [updatingRoleUserId, setUpdatingRoleUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
@@ -497,9 +539,6 @@ export default function GroupDetailPage() {
     const targetMessage = messages.find((message) => message.id === messageId)
     if (!targetMessage || targetMessage.user_id !== currentUser.id) return
 
-    const confirmed = window.confirm('¿Deseas eliminar este mensaje?')
-    if (!confirmed) return
-
     const previousMessages = messages
     setDeletingMessageId(messageId)
     setMessages((prev) => prev.filter((message) => message.id !== messageId))
@@ -632,9 +671,6 @@ export default function GroupDetailPage() {
   const handleDeleteGroup = async () => {
     if (!group || !canDelete || deleting) return
 
-    const confirmed = window.confirm('Esta acción eliminará el grupo. ¿Deseas continuar?')
-    if (!confirmed) return
-
     try {
       setDeleting(true)
       const { data: { session } } = await supabase.auth.getSession()
@@ -666,9 +702,6 @@ export default function GroupDetailPage() {
       setError('Eres el creador del grupo. Para salir, elimina el grupo o transfiere la administración primero.')
       return
     }
-
-    const confirmed = window.confirm('¿Seguro que quieres salir de este grupo?')
-    if (!confirmed) return
 
     try {
       setLeaving(true)
@@ -749,33 +782,55 @@ export default function GroupDetailPage() {
               <p className="text-slate-600">{group.subject}</p>
             </div>
           </div>
-          <div className="w-full md:w-auto md:justify-end">
-            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-              <Link
-                href="/explore"
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 text-center w-full sm:w-auto"
-              >
-                Cambiar grupo
-              </Link>
-              {canDelete ? (
-                <button
-                  onClick={handleDeleteGroup}
-                  disabled={deleting || leaving}
-                  className="px-4 py-2 rounded-xl border border-rose-200 text-rose-700 font-semibold hover:bg-rose-50 disabled:opacity-50 w-full sm:w-auto"
-                >
-                  {deleting ? 'Eliminando...' : 'Eliminar grupo'}
-                </button>
-              ) : (
-                <button
-                  onClick={handleLeaveGroup}
-                  disabled={leaving || deleting}
-                  className="px-4 py-2 rounded-xl border border-amber-200 text-amber-700 font-semibold hover:bg-amber-50 disabled:opacity-50 w-full sm:w-auto"
-                >
-                  {leaving ? 'Saliendo...' : 'Salir del grupo'}
-                </button>
-              )}
+          {isMember && (
+            <div className="w-full md:w-auto md:justify-end">
+              <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                {isCurrentUserAdmin ? (
+                  <>
+                    <Link
+                      href={`/groups/${groupId}/edit`}
+                      className="px-4 py-2 rounded-xl border border-sky-200 text-sky-700 font-semibold hover:bg-sky-50 text-center w-full sm:w-auto"
+                    >
+                      Editar grupo
+                    </Link>
+                    {canDelete ? (
+                      <button
+                        onClick={() => setShowDeleteGroupModal(true)}
+                        disabled={deleting || leaving}
+                        className="px-4 py-2 rounded-xl border border-rose-200 text-rose-700 font-semibold hover:bg-rose-50 disabled:opacity-50 w-full sm:w-auto"
+                      >
+                        {deleting ? 'Eliminando...' : 'Eliminar grupo'}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setShowLeaveGroupModal(true)}
+                        disabled={leaving || deleting}
+                        className="px-4 py-2 rounded-xl border border-amber-200 text-amber-700 font-semibold hover:bg-amber-50 disabled:opacity-50 w-full sm:w-auto"
+                      >
+                        {leaving ? 'Saliendo...' : 'Salir del grupo'}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/explore"
+                      className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 text-center w-full sm:w-auto"
+                    >
+                      Cambiar grupo
+                    </Link>
+                    <button
+                      onClick={() => setShowLeaveGroupModal(true)}
+                      disabled={leaving || deleting}
+                      className="px-4 py-2 rounded-xl border border-amber-200 text-amber-700 font-semibold hover:bg-amber-50 disabled:opacity-50 w-full sm:w-auto"
+                    >
+                      {leaving ? 'Saliendo...' : 'Salir del grupo'}
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </header>
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
@@ -937,12 +992,21 @@ export default function GroupDetailPage() {
                             <span>{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
 
-                          <button
-                            type="button"
+                          <div
+                            role={isOwnMessage && !isTemporaryMessageId(message.id) ? 'button' : undefined}
+                            tabIndex={isOwnMessage && !isTemporaryMessageId(message.id) ? 0 : -1}
                             onClick={() => {
                               if (!isOwnMessage || isTemporaryMessageId(message.id)) return
                               if (editingMessageId && editingMessageId !== message.id) return
                               setSelectedMessageId((prev) => (prev === message.id ? null : message.id))
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault()
+                                if (!isOwnMessage || isTemporaryMessageId(message.id)) return
+                                if (editingMessageId && editingMessageId !== message.id) return
+                                setSelectedMessageId((prev) => (prev === message.id ? null : message.id))
+                              }
                             }}
                             className={`text-left rounded-2xl px-3 py-2 shadow-sm border transition ${isOwnMessage ? 'bg-blue-600 text-white border-blue-500 rounded-br-md' : 'bg-white text-slate-800 border-slate-200 rounded-bl-md'} ${isOwnMessage && !isTemporaryMessageId(message.id) ? 'cursor-pointer' : 'cursor-default'} ${showOwnActions ? 'ring-2 ring-blue-200' : ''}`}
                           >
@@ -967,9 +1031,9 @@ export default function GroupDetailPage() {
                                 autoFocus
                               />
                             ) : (
-                              <p className="text-sm whitespace-pre-wrap break-words">{message.message}</p>
+                              <p className="text-sm whitespace-pre-wrap break-words">{renderMessageWithLinks(message.message, isOwnMessage)}</p>
                             )}
-                          </button>
+                          </div>
 
                           {showOwnActions && (
                             <div className="flex items-center gap-2">
@@ -1009,7 +1073,7 @@ export default function GroupDetailPage() {
                                   </button>
                                   <button
                                     type="button"
-                                    onClick={() => handleDeleteMessage(message.id)}
+                                    onClick={() => setPendingDeleteMessageId(message.id)}
                                     disabled={deletingMessageId === message.id}
                                     className="h-7 w-7 rounded-full border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 flex items-center justify-center disabled:opacity-50"
                                     title="Eliminar mensaje"
@@ -1089,6 +1153,51 @@ export default function GroupDetailPage() {
             ))}
           </div>
         </section>
+
+        <ConfirmModal
+          open={Boolean(pendingDeleteMessageId)}
+          title="Eliminar mensaje"
+          description="Esta acción no se puede deshacer."
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
+          onConfirm={() => {
+            if (!pendingDeleteMessageId) return
+            handleDeleteMessage(pendingDeleteMessageId)
+            setPendingDeleteMessageId(null)
+          }}
+          onCancel={() => setPendingDeleteMessageId(null)}
+          loading={Boolean(deletingMessageId)}
+          variant="danger"
+        />
+
+        <ConfirmModal
+          open={showDeleteGroupModal}
+          title="Eliminar grupo"
+          description="Se eliminará el grupo y su información asociada."
+          confirmLabel="Eliminar grupo"
+          cancelLabel="Cancelar"
+          onConfirm={() => {
+            handleDeleteGroup()
+            setShowDeleteGroupModal(false)
+          }}
+          onCancel={() => setShowDeleteGroupModal(false)}
+          loading={deleting}
+          variant="danger"
+        />
+
+        <ConfirmModal
+          open={showLeaveGroupModal}
+          title="Salir del grupo"
+          description="Perderás acceso al chat y a la información interna del grupo."
+          confirmLabel="Salir del grupo"
+          cancelLabel="Cancelar"
+          onConfirm={() => {
+            handleLeaveGroup()
+            setShowLeaveGroupModal(false)
+          }}
+          onCancel={() => setShowLeaveGroupModal(false)}
+          loading={leaving}
+        />
       </div>
     </div>
   )
