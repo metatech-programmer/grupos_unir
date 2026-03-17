@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { SUBJECTS } from '@/lib/subjects'
 import { ACTIVITIES, DAILY_HOURS, WORK_STATUS, SCHEDULE_SLOTS } from '@/lib/profile-options'
 import LoadingScreen from '@/components/LoadingScreen'
-import { Button, Input, Card } from '@/components/ui'
+import { Button, Card } from '@/components/ui'
 
 type GroupForm = {
   name: string
