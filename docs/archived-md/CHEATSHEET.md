@@ -1,103 +1,104 @@
-# 🎯 Referencia Rápida - Comandos Útiles
+# Quick Reference — Common Commands and Structure
 
-## 🚀 Desarrollo
+## Development Commands
 
 ```bash
-# Ejecutar localmente
+# Start development server
 npm run dev
 
-# Ir a http://localhost:3000
+# Access application
+# Navigate to http://localhost:3000
 ```
 
-## 🔨 Build
+## Build and Production
 
 ```bash
-# Crear versión de producción
+# Create production build
 npm run build
 
-# Ejecutar versión producción
+# Run production version
 npm start
 
-# Verificar errores
+# Check for errors
 npm run lint
 ```
 
-## 📦 Estructura de Carpetas
+## Folder Structure
 
 ```
 grupos/
 ├── src/
-│   ├── app/              # Páginas (Next.js App Router)
-│   │   ├── page.tsx      # Home
-│   │   ├── register/     # Página registro
-│   │   ├── login/        # Página login
-│   │   ├── dashboard/    # Panel principal
-│   │   ├── explore/      # Ver grupos
-│   │   └── groups/[id]/  # Detalle grupo
-│   ├── lib/              # Lógica compartida
-│   │   ├── supabase.ts   # Cliente BD
-│   │   ├── ai-matching.ts # Algoritmo IA
-│   │   └── timezones.ts  # Zonas horarias
-│   └── app/globals.css   # Estilos globales
-├── .env.local            # Tus credenciales (No pushear!)
-├── README.md             # Documentación completa
-├── GETTING_STARTED.md    # Guía rápida
-├── QUICK_START.md        # Inicio muy rápido
-├── ARCHITECTURE.md       # Cómo funciona
-├── SETUP.sql             # Script BD
-└── package.json          # Dependencias
-
+│   ├── app/              # Pages (Next.js App Router)
+│   │   ├── page.tsx      # Homepage
+│   │   ├── register/     # Registration page
+│   │   ├── login/        # Login page
+│   │   ├── dashboard/    # Main dashboard
+│   │   ├── explore/      # Browse groups
+│   │   └── groups/[id]/  # Group details
+│   ├── lib/              # Shared utilities
+│   │   ├── supabase.ts   # Database client
+│   │   ├── ai-matching.ts # Matching algorithm
+│   │   └── timezones.ts  # Timezone utilities
+│   ├── components/       # Reusable components
+│   └── app/globals.css   # Global styles
+├── .env.local           # Credentials (do not commit)
+├── README.md            # Full documentation
+├── GETTING_STARTED.md   # Setup guide
+├── QUICK_START.md       # Quick reference
+├── ARCHITECTURE.md      # System design
+├── SETUP.sql            # Database schema
+└── package.json         # Dependencies
 ```
 
-## 🌐 Variables de Entorno
+## Environment Variables
 
 ```env
-# En .env.local
+# Required in .env.local
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
 ```
 
-## 🔧 Dependencias Principales
+## Main Dependencies
 
-- **Next.js 15**: Framework React
-- **React 18**: Librería UI
-- **Supabase**: Database + Auth
-- **Tailwind CSS**: Estilos
-- **TypeScript**: Tipado seguro
+- **Next.js 15**: React framework
+- **React 18**: UI library
+- **Supabase**: Database and authentication
+- **Tailwind CSS**: Styling utility
+- **TypeScript**: Type safety
 
-## 📋 Checklist Configuración
+## Setup Checklist
 
-- [ ] Crear proyecto en Supabase.com
-- [ ] Ejecutar SETUP.sql en Supabase
-- [ ] Copiar credenciales de Supabase
-- [ ] Crear `.env.local` con credenciales
-- [ ] `npm install` (si no está hecho)
-- [ ] `npm run dev`
-- [ ] Abrir http://localhost:3000
-- [ ] Registrarse y probar
+- [ ] Create Supabase project
+- [ ] Execute SETUP.sql in Supabase
+- [ ] Copy credentials from Supabase
+- [ ] Create `.env.local` with credentials
+- [ ] Run `npm install` (if needed)
+- [ ] Run `npm run dev`
+- [ ] Open http://localhost:3000
+- [ ] Register and test functionality
 
-## 🚀 Deploy en Vercel
+## Deploy to Vercel
 
-1. Push a GitHub:
+1. Push to GitHub:
 ```bash
 git init
 git add .
-git commit -m "Inicial"
-git remote add origin https://github.com/TU/grupos
+git commit -m "Initial commit"
+git remote add origin https://github.com/USERNAME/grupos
 git push -u origin main
 ```
 
-2. En vercel.com:
+2. On vercel.com:
    - Click "New Project"
-   - Selecciona tu repo
-   - Agrega variables de entorno
+   - Select repository
+   - Add environment variables
    - Click "Deploy"
 
-## 📚 Documentos
+## Documentation Files
 
-- **README.md**: Documentación oficial completa
-- **GETTING_STARTED.md**: Paso a paso muy detallado
-- **QUICK_START.md**: Guía alternativa rápida
+- **README.md**: Complete documentation and features
+- **GETTING_STARTED.md**: Step-by-step setup
+- **QUICK_START.md**: Quick reference guide
 - **ARCHITECTURE.md**: Cómo funciona internamente todo
 - **SETUP.sql**: Código SQL de la base de datos
 

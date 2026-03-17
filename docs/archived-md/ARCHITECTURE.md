@@ -1,18 +1,18 @@
-# 🏗️ Arquitectura del Sistema
+# System Architecture
 
-## 📋 Visión General
+## Overview
 
 ```
 ┌─────────────────┐
 │   Frontend      │  Next.js + React + Tailwind
-│   (Next.js)     │  Interfaz de usuario
+│   (Next.js)     │  User Interface
 └────────┬────────┘
          │
          │ API Routes
          │
 ┌─────────────────┐     ┌──────────────────────┐
 │  API Routes     │────▶│  Supabase Backend    │
-│  (Matching AI)  │     │  (PostgreSQL)        │
+│  (Matching)     │     │  (PostgreSQL)        │
 └────────┬────────┘     └──────────────────────┘
          │                         │
          │                         │
@@ -20,111 +20,151 @@
                        │
                        ▼
               ┌────────────────────┐
-              │  Realtime Updates  │
-              │  WebSocket (RT)    │
+              │  Real-time Updates │
+              │  WebSocket         │
               └────────────────────┘
 ```
 
-## 🗄️ Estructura de la Base de Datos
+## Database Schema
 
-### Tabla: `users`
+### Table: `users`
 ```sql
-id (UUID)           -- Identificador único
-auth_id (UUID)      -- ID de Supabase Auth
-name (TEXT)         -- Nombre del usuario
-email (TEXT)        -- Email único
-country (TEXT)      -- País (código: es, co, pe, etc.)
-timezone (TEXT)     -- Zona horaria (e.g., "America/Bogota")
-group_id (UUID)     -- ID del grupo al que pertenece
-created_at (DATE)   -- Fecha de registro
+id (UUID)           -- Unique identifier
+auth_id (UUID)      -- Supabase Auth ID
+name (TEXT)         -- User's full name
+email (TEXT)        -- Unique email address
+country (TEXT)      -- Country code (e.g., es, co, pe)
+timezone (TEXT)     -- IANA timezone (e.g., America/Bogota)
+group_id (UUID)     -- Current group (foreign key)
+created_at (DATE)   -- Registration date
 ```
 
-### Tabla: `groups`
+### Table: `groups`
 ```sql
-id (UUID)              -- Identificador único
-name (TEXT)            -- Nombre del grupo
-subject (TEXT)         -- Asignatura (Programación, Matemáticas, etc.)
-members (TEXT[])       -- Array de IDs de usuarios
-member_count (INT)     -- Contador rápido de miembros
-max_size (INT)         -- Máximo permitido (3-5)
-timezone_coverage (TEXT[]) -- Zonas horarias cubiertas
-pros (TEXT[])          -- Ventajas del grupo
-cons (TEXT[])          -- Desventajas del grupo
-created_at (DATE)      -- Fecha de creación
+id (UUID)                 -- Unique identifier
+name (TEXT)               -- Group name
+subject (TEXT)            -- Subject area (Programming, Mathematics, etc.)
+members (TEXT[])          -- Array of user IDs
+member_count (INT)        -- Quick member count
+max_size (INT)            -- Maximum allowed size (3-5)
+timezone_coverage (TEXT[])-- Time zones represented in group
+pros (TEXT[])             -- Group advantages
+cons (TEXT[])             -- Group disadvantages
+created_at (DATE)         -- Creation date
 ```
 
-### Tabla: `group_members`
+### Table: `group_members`
 ```sql
-user_id (UUID)     -- Referencia a usuario
-group_id (UUID)    -- Referencia a grupo
-joined_at (DATE)   -- Fecha de incorporación
+user_id (UUID)     -- User reference
+group_id (UUID)    -- Group reference
+joined_at (DATE)   -- Join date
 ```
 
-## 🧠 Algoritmo de Matching de IA
+## Matching Algorithm
 
-### Fórmula de Compatibilidad
+### Compatibility Score Formula
+
+The matching algorithm evaluates groups on multiple criteria with a maximum score of 100:
 
 ```
-Puntuación = (TZ_Score × 0.40) + (Size_Score × 0.30) + (Space_Score × 0.20) + (Diversity_Score × 0.10)
+Timezone Compatibility (25 points max)
+  - Compatible timezone (≤8 hour difference): 25 points
+  - Incompatible timezone (>8 hours): 6 points
 
-Donde:
-- TZ_Score (Zona Horaria): 0-100 (40% del peso)
-  - Si diferencia ≤ 8 horas: 100 puntos
-  - Si diferencia > 8 horas: 25 puntos (penalización)
-  
-- Size_Score (Tamaño): 0-100 (30% del peso)
-  - 2-3 miembros: 100 puntos (ideal)
-  - 4 miembros: 67 puntos
-  - 5 miembros: 0 puntos (lleno)
-  
-- Space_Score (Espacio): 0-100 (20% del peso)
-  - 2+ espacios: 100 puntos
-  - 1 espacio: 50 puntos
-  - 0 espacios: 0 puntos
-  
-- Diversity_Score (Diversidad): 0-100 (10% del peso)
-  - 2+ zonas horarias: 100 puntos
-  - 1 zona horaria: 0 puntos
+Schedule Overlap (25 points max)
+  - 4+ overlapping hours: 25 points
+  - 2-3 overlapping hours: 16 points
+  - 1 overlapping hour: 8 points
+  - Less than 1 hour: 0 points
+
+Daily Hours Availability (20 points max)
+  - Exact match: 20 points
+  - ±1 hour difference: 15 points
+  - ±2 hour difference: 8 points
+  - >2 hours difference: 0 points
+
+Work Style Compatibility (15 points max)
+  - Matching work style or flexible: 15 points
+  - Different work style: 6 points
+
+Shared Activities (15 points max)
+  - 2+ shared activities: 15 points
+  - 1 shared activity: 9 points
+  - No shared activities: 0 points
+
+Group Size Adjustment (5 points bonus)
+  - 2-3 members (ideal): +5 points
+  - 4 members: +3 points
+  - 5+ members: +1 point
+
+Available Spaces Adjustment (5 points bonus)
+  - 2+ open slots: +5 points
+  - 1 open slot: +2 points
+  - Group full: 0 points
+
+Total Score: 0-100 points
 ```
 
----
+### Implementation
 
-## 🔐 Seguridad
+The matching algorithm is implemented in `src/lib/ai-matching.ts` and:
+- Evaluates all available groups for the current user
+- Calculates compatibility score for each group
+- Returns sorted recommendations (highest to lowest)
+- Allows users to override recommendations
 
-### Row Level Security (RLS)
+## Security
+
+### Row Level Security (RLS) Policies
 
 ```sql
--- Los usuarios solo ven sus propios datos
+-- Users view only their own data
 CREATE POLICY "Users can view their own data"
   ON users FOR SELECT
   USING (auth.uid() = auth_id);
 
--- Todos pueden ver los grupos (lectura)
+-- Public group visibility
 CREATE POLICY "Anyone can view groups"
   ON groups FOR SELECT
   USING (true);
 
--- Solo el creador puede editar su grupo
+-- Only creators can edit their groups
 CREATE POLICY "Only group creator can edit"
   ON groups FOR UPDATE
   USING (creator_id = auth.uid());
 ```
 
----
-
-## ⚙️ Configuración Deployed en Vercel
-
-### Variables de Entorno
+### Environment Variables
 
 ```env
-# PÚBLICA (seguro compartir)
+# Public (safe to share)
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhb...
 
-# PRIVADA (NO compartir - si fuera necesaria)
-# SUPABASE_SERVICE_ROLE=ey...
+# Private (never share)
+# Service role key only used server-side (if needed)
 ```
 
----
+## Technology Stack
 
-Esta arquitectura es escalable, segura y documentada para permitir despliegues en Vercel y una integración fácil con Supabase.
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| Frontend | Next.js 15 | React framework |
+| UI Framework | React 18 | Component library |
+| Styling | Tailwind CSS | Utility-first CSS |
+| Authentication | Supabase Auth | User management |
+| Database | Supabase PostgreSQL | Data persistence |
+| Type Safety | TypeScript | Static typing |
+| Deployment | Vercel | Hosting |
+| Real-time | Supabase Realtime | WebSocket updates |
+
+## API Routes
+
+### Available Endpoints
+
+- `POST /api/account/delete` - Delete user account
+- `POST /api/push/subscribe` - Subscribe to notifications
+- `POST /api/push/unsubscribe` - Unsubscribe from notifications
+- `POST /api/push/new-message` - Send push notification
+
+This architecture is scalable, secure, and documented for seamless Vercel deployment with Supabase integration.

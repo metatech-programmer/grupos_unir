@@ -1,173 +1,174 @@
-# 🎯 Comenzar Ahora - Instrucciones Paso a Paso
+# Getting Started - Quick Setup Guide
 
-## ✅ Requisitos Previos
-- Node.js 18+ instalado
-- Cuenta GitHub (opcional)
-- Cuenta en Supabase (gratis en supabase.com)
+## Prerequisites
+- Node.js 18+ installed
+- GitHub account (optional)
+- Supabase account (free at supabase.com)
 
 ---
 
-## 📋 Pasos (5-10 minutos)
+## Setup Steps (5-10 minutes)
 
-### PASO 1: Crear Proyecto Supabase
-1. Abre https://supabase.com en tu navegador
-2. Click en **"Start your project"** o **"Sign In"**
-3. Usa GitHub para crear cuenta (más rápido)
+### Step 1: Create Supabase Project
+1. Navigate to https://supabase.com in your browser
+2. Click **"Start your project"** or **"Sign In"**
+3. Create an account using GitHub (fastest option)
 4. Click **"New Project"**
-   - Nombre: `grupos`
-   - Contraseña: Cualquiera (no es importante)
-   - Región: Más cercana a ti
-5. **Espera 2-3 minutos** a que se cree
+   - Name: `grupos`
+   - Password: Choose any secure password
+   - Region: Select the closest region to you
+5. Wait 2-3 minutes for the project to be created
 
-### PASO 2: Crear La Base de Datos
-1. En Supabase, lado izquierdo, busca **"SQL Editor"**
-2. Click en **"New query"**
-3. Abre [SETUP.sql](./SETUP.sql) en tu editor
-4. Copia TODO el código
-5. Pégalo en Supabase SQL Editor
-6. Click **"Run"** (botón verde)
-7. ¡Listo! La BD está lista
+### Step 2: Set Up Database
+1. In Supabase, navigate to **"SQL Editor"** on the left sidebar
+2. Click **"New query"**
+3. Open [SETUP.sql](./SETUP.sql) in your text editor
+4. Copy all the SQL code
+5. Paste it into the Supabase SQL Editor
+6. Click **"Run"** (green button)
+7. The database is now configured
 
-### PASO 3: Obtener Credenciales
-1. En Supabase, lado izquierdo: **"Settings"**
-2. Luego: **"API"**
-3. Copia estos 2 valores:
+### Step 3: Obtain Credentials
+1. In Supabase, navigate to **"Settings"** in the left sidebar
+2. Select **"API"**
+3. Copy the following values:
    ```
    Project URL:  https://xxxxxxxxxxxx.supabase.co
    anon public:  eyJhbGc...xxxxx
    ```
 
-### PASO 4: Configurar App Localmente
-1. En esta carpeta, crea file `.env.local`:
+### Step 4: Configure Local Environment
+1. Create a `.env.local` file in the project root:
    ```
    NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...xxxxx
    ```
-   *(Reemplaza con tus valores del Paso 3)*
+   *Replace these values with credentials from Step 3*
 
-2. Abre **Terminal** en esta carpeta
-3. Ejecuta:
+2. Open Terminal in the project directory
+3. Run:
    ```bash
    npm run dev
    ```
 
-4. Abre http://localhost:3000 en tu navegador
-5. ✅ **¡Tu app está funcionando!**
+4. Navigate to http://localhost:3000 in your browser
+5. The application is now running
 
 ---
 
-## 🧪 Prueba la App
+## Testing the Application
 
-### Crear Cuenta
-1. Click "Registrarse"
-2. Completa:
-   - Nombre: Tu nombre
-   - Email: cualquier@email.com
-   - País: Tu país
-   - Zona Horaria: La tuya
-   - Contraseña: Tu contraseña
-3. Click "Registrarse"
+### Create an Account
+1. Click **"Register"**
+2. Fill in the following information:
+   - Name: Your name
+   - Email: your-email@example.com
+   - Country: Your country
+   - Timezone: Your timezone
+   - Password: Your password
+3. Click **"Register"**
 
-### Explorar Grupos
-1. Verás Dashboard
-2. Click "Explorar Grupos"
-3. La IA te sugiere grupos con:
-   - ✅ Pros (ventajas)
-   - ⚠️ Cons (desventajas)
-   - % Compatibilidad
-4. Click "Unirse a Este Grupo"
-5. ¡Listo!
+### Explore Groups
+1. You will see the Dashboard
+2. Click **"Explore Groups"**
+3. The AI recommends groups based on:
+   - Advantages
+   - Disadvantages
+   - Compatibility percentage
+4. Click **"Join This Group"**
+5. Complete
+
 
 ---
 
-## 🚀 Desplegar en Vercel (GRATIS)
+## Deploy to Vercel (Free)
 
-### Opción A: Usando GitHub (Recomendado)
+### Option A: Using GitHub (Recommended)
 ```bash
-# En Terminal, en la carpeta del proyecto:
+# In the terminal, in the project directory:
 git init
 git add .
 git commit -m "Initial commit"
-git remote add origin https://github.com/TU-USUARIO/grupos.git
+git remote add origin https://github.com/YOUR-USERNAME/grupos.git
 git push -u origin main
 ```
 
-Luego:
-1. Ve a https://vercel.com
-2. Click "New Project"
-3. Selecciona tu repo "grupos"
-4. Click "Import"
-5. En **Environment Variables**:
-   - `NEXT_PUBLIC_SUPABASE_URL` = tu URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = tu clave
-6. Click "Deploy"
-7. **¡Tu app está VIVA en Internet!** 🎉
+Then:
+1. Go to https://vercel.com
+2. Click **"New Project"**
+3. Select your "grupos" repository
+4. Click **"Import"**
+5. In **Environment Variables**, add:
+   - `NEXT_PUBLIC_SUPABASE_URL` = your URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your key
+6. Click **"Deploy"**
+7. Your application is now live on the internet
 
-### Opción B: Directo en Vercel
-1. Ve a https://vercel.com
-2. Click "New Project"
-3. Selecciona esta carpeta (zip)
-4. Llena variables de entorno
+### Option B: Direct Vercel Upload
+1. Go to https://vercel.com
+2. Click **"New Project"**
+3. Upload this folder as a zip file
+4. Configure environment variables
 5. Deploy
 
 ---
 
-## 📊 Datos de Prueba
+## Sample Test Data
 
-Ejecuta esto en Supabase SQL Editor para agregar grupos de ejemplo:
+To add example groups, run this in the Supabase SQL Editor:
 
 ```sql
 INSERT INTO groups (name, subject, max_size, timezone_coverage, pros, cons) VALUES
-('Equipo Backend', 'Programación', 5, 
+('Backend Team', 'Programming', 5, 
  ARRAY['Europe/Madrid'], 
- ARRAY['España juntos', 'Excelente coordin.'], 
+ ARRAY['Same location', 'Excellent coordination'], 
  ARRAY[]),
 
-('Equipo Global', 'Inglés', 4, 
+('Global Team', 'English', 4, 
  ARRAY['Europe/Madrid', 'America/Bogota'], 
- ARRAY['Multicultural', 'Aprenderás'], 
- ARRAY['Horarios complicados']);
+ ARRAY['Multicultural', 'Language learning'], 
+ ARRAY['Complex schedules']);
 ```
 
 ---
 
-## 🔥 Características Principales
+## Key Features
 
-| Feature | Estado |
+| Feature | Status |
 |---------|--------|
-| Registro/Login | ✅ Funcionando |
-| Base de Datos | ✅ Supabase |
-| Recomendaciones IA | ✅ Matching inteligente |
-| Temps Reales | ✅ WebSocket |
-| Mostrar Pros/Cons | ✅ Cada grupo |
-| Zonas Horarias | ✅ 15+ países |
-| Responsive | ✅ Mobile friendly |
-| Gratuito | ✅ 100% free |
+| Register/Login | Working |
+| Database | Supabase PostgreSQL |
+| AI Recommendations | Intelligent matching |
+| Real-time Updates | WebSocket |
+| Pros/Cons Display | Per group |
+| Timezone Support | 15+ countries |
+| Responsive Design | Mobile friendly |
+| Cost | 100% free |
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
-| Error | Solución |
+| Error | Solution |
 |-------|----------|
-| "NEXT_PUBLIC_SUPABASE_URL not found" | Verifica `.env.local` existe |
-| "Cannot connect to database" | Copia BIEN los valores de Supabase |
-| "Blank page" | F12 > Console, busca red errors |
-| "Puerto 3000 ocupado" | `npm run dev -- -p 3001` |
-| "Build failed" | `npm run build` para ver errores |
+| "NEXT_PUBLIC_SUPABASE_URL not found" | Verify `.env.local` exists and has correct values |
+| "Cannot connect to database" | Double-check Supabase credentials |
+| "Blank page" | Press F12, check Console for error messages |
+| "Port 3000 already in use" | Run `npm run dev -- -p 3001` |
+| "Build failed" | Run `npm run build` to see detailed errors |
 
 ---
 
-## 📚 Documentación Completa
+## Additional Resources
 
-- [README.md](./README.md) - Documentación completa
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - Cómo funciona la IA
-- [SETUP.sql](./SETUP.sql) - Base de datos SQL
-- [QUICK_START.md](./QUICK_START.md) - Guía alternativa
+- [README.md](./README.md) - Complete documentation
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - System design
+- [SETUP.sql](./SETUP.sql) - Database schema
+- [QUICK_START.md](./QUICK_START.md) - Alternative quick guide
 
 ---
 
-## 🎓 Aprender Más
+## Learning Resources
 
 - **Next.js**: https://nextjs.org/learn
 - **Supabase**: https://supabase.com/docs
@@ -176,37 +177,21 @@ INSERT INTO groups (name, subject, max_size, timezone_coverage, pros, cons) VALU
 
 ---
 
-## ✨ Siguientes Pasos (Opcional)
+## Next Steps (Optional)
 
-Después de que funcione, puedes:
-1. Cambiar colores en `tailwind.config.ts`
-2. Agregar más países en `src/lib/timezones.ts`
-3. Agregar tu logo en `public/logo.png`
-4. Crear tu propio grupo en la BD
-5. Invitar amigos
-
----
-
-## 💡 Tips
-
-- Usa **Incognito** para simular otro usuario
-- Los datos en Supabase se ven en **Table Editor**
-- Las contraseñas se hashean automáticamente
-- Todo es GRATIS hasta 500k filas en BD
-- Vercel es gratis para proyectos pequeños
+After the application is working:
+1. Customize colors in `tailwind.config.ts`
+2. Add more countries in `src/lib/timezones.ts`
+3. Upload your logo to `public/logo.png`
+4. Create your first group in the database
+5. Invite colleagues to join
 
 ---
 
-## 🤝 Soporte
+## Tips
 
-Si algo no funciona:
-1. Ve a [README.md](./README.md) - Sección FAQ
-2. Mira [ARCHITECTURE.md](./ARCHITECTURE.md) - Entender sistema
-3. Verifica Console (F12) para errores
-4. Compara tus valores de Supabase
-
----
-
-**¡Felicidades, tu app de grupos está lista! 🎉**
-
-**Comparte con tus compañeros y que se organicen mejor.**
+- Use **Incognito mode** to simulate multiple users
+- View data in Supabase **Table Editor**
+- Passwords are automatically hashed
+- Database is free up to 500k rows
+- Vercel is free for small projects

@@ -1,42 +1,42 @@
-# 🚀 Guía Rápida de Inicio
+# Quick Start Guide
 
-## ⚡ Primeros Pasos (5 minutos)
+## Getting Started in 5 Minutes
 
-### 1️⃣ Crear Proyecto Supabase Gratuito
-1. Ve a https://supabase.com
-2. Haz clic en **"Start your project"**
-3. Crea una cuenta (GitHub de la forma más rápida)
-4. Crea un nuevo proyecto con nombre "grupos"
-5. Espera a que se cree (2-3 minutos)
+### Step 1: Create Free Supabase Project
+1. Visit https://supabase.com
+2. Click **"Start your project"**
+3. Create account using GitHub (fastest option)
+4. Create new project named "grupos"
+5. Wait 2-3 minutes for setup
 
-### 2️⃣ Crear Tablas en Supabase
-1. En tu proyecto, ve a **SQL Editor** (lado izquierdo)
-2. Haz clic en **"New Query"**
-3. Copia TODO el código SQL del archivo [SETUP.sql](./SETUP.sql)
-4. Haz clic en **"Run"**
-5. ¡Listo! La base de datos está creada
+### Step 2: Configure Database
+1. In your project, navigate to **SQL Editor** (left sidebar)
+2. Click **"New Query"**
+3. Copy all SQL code from [SETUP.sql](./SETUP.sql)
+4. Click **"Run"**
+5. Database is ready
 
-### 3️⃣ Obtener Credenciales
-1. Ve a **Settings > API** (lado izquierdo)
-2. Copia:
+### Step 3: Get Credentials
+1. Open **Settings > API** (left sidebar)
+2. Copy:
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
    - **anon public** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-### 4️⃣ Configurar Variables de Entorno
-1. En la carpeta del proyecto, copia el archivo `.env.example`:
+### Step 4: Set Environment Variables
+1. Copy `.env.example` file:
    ```bash
    cp .env.example .env.local
    ```
 
-2. Abre `.env.local` y pega:
+2. Edit `.env.local` and paste:
    ```env
-   NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-clave-aqui
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key-here
    ```
 
-### 5️⃣ Ejecutar Localmente
+### Step 5: Run Locally
 ```bash
 npm run dev
 ```
 
-Ve a http://localhost:3000 ¡Tu app está lista! 🎉
+Visit http://localhost:3000 — Your app is running!
